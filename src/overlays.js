@@ -73,7 +73,7 @@ export function closeContextMenu({ restoreFocus = false } = {}) {
   if (restoreFocus && opener?.isConnected) opener.focus();
 }
 
-/** Open a menu at viewport coordinates. items: [{ label, onSelect, danger? }] */
+/** Open a menu at viewport coordinates. items: [{ label, onSelect, danger?, accent?, separator? }] (separator: rule above) */
 export function openContextMenu(x, y, items) {
   closeContextMenu();
   const opener = document.activeElement;
@@ -87,7 +87,7 @@ export function openContextMenu(x, y, items) {
         {
           type: "button",
           role: "menuitem",
-          class: item.danger ? "danger" : "",
+          class: [item.danger && "danger", item.accent && "accent", item.separator && "separator"].filter(Boolean).join(" "),
           onClick: () => {
             closeContextMenu();
             item.onSelect();
@@ -120,18 +120,21 @@ export function openContextMenu(x, y, items) {
     }
   };
   const dismiss = () => closeContextMenu();
+  const onScroll = (e) => {
+    if (!menu.contains(e.target)) closeContextMenu(); // scrolling a long menu itself is fine
+  };
 
   document.addEventListener("pointerdown", onPointerDown, true);
   document.addEventListener("keydown", onKeyDown, true);
   window.addEventListener("blur", dismiss);
   window.addEventListener("resize", dismiss);
-  window.addEventListener("scroll", dismiss, true);
+  window.addEventListener("scroll", onScroll, true);
   const cleanup = () => {
     document.removeEventListener("pointerdown", onPointerDown, true);
     document.removeEventListener("keydown", onKeyDown, true);
     window.removeEventListener("blur", dismiss);
     window.removeEventListener("resize", dismiss);
-    window.removeEventListener("scroll", dismiss, true);
+    window.removeEventListener("scroll", onScroll, true);
   };
 
   active = { menu, opener, cleanup };

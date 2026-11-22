@@ -333,6 +333,8 @@ h3 .count {
   border-radius: 8px;
   background: var(--surface);
   box-shadow: 0 8px 24px #000a;
+  max-height: min(20rem, 60vh);
+  overflow-y: auto;
 }
 
 .context-menu button {
@@ -355,6 +357,17 @@ h3 .count {
 
 .context-menu .danger {
   color: #e5706b;
+}
+
+.context-menu .accent {
+  color: var(--accent);
+}
+
+.context-menu .separator {
+  margin-top: 0.25rem;
+  border-top: 1px solid #ffffff1f;
+  border-radius: 0 0 5px 5px;
+  padding-top: 0.55rem;
 }
 
 .link-button {
@@ -428,12 +441,6 @@ h3 .count {
   background: var(--surface);
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px #0008;
 }
 
 .card img {
@@ -458,9 +465,25 @@ h3 .count {
   padding: 0 0.5rem 0.6rem;
 }
 
-.tag-group {
+.tag-group + .tag-group {
+  padding-top: 0.55rem;
+  border-top: 1px solid #ffffff1f;
+}
+
+.tag-group-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kind);
+  opacity: 0.85;
+}
+
+.tag-list {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.3rem;
 }
 
@@ -473,6 +496,29 @@ h3 .count {
   background: color-mix(in srgb, var(--kind) 18%, transparent);
   color: var(--kind);
   font-size: 0.75rem;
+}
+
+.tag--multiple {
+  background: color-mix(in srgb, var(--kind) 32%, transparent);
+}
+
+.tag-count {
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.tag-count:hover {
+  opacity: 1;
+  background: #ffffff26;
 }
 
 .tag-remove {
@@ -494,7 +540,6 @@ h3 .count {
 
 .tag-add,
 .tag-input {
-  width: 100%;
   padding: 0.25rem 0.4rem;
   border: 1px dashed #ffffff40;
   border-radius: 6px;
@@ -503,9 +548,31 @@ h3 .count {
   color: var(--muted);
 }
 
-.tag-add option {
-  background: var(--surface);
-  color: var(--text);
+/* The add control: a dashed circle, the same height as a tag chip (1.2rem button + 0.1rem padding each side).
+   The "+" is drawn with two gradient bars so it is exactly centered, whatever the font. */
+.tag-add {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0;
+  color: var(--muted);
+  background:
+    linear-gradient(currentColor, currentColor) center / 0.6rem 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 0.6rem no-repeat;
+  cursor: pointer;
+}
+
+.tag-add:hover,
+.tag-add:focus-visible {
+  border-color: var(--kind);
+  color: var(--kind);
+}
+
+.tag-input {
+  flex: 1 1 8rem;
+  min-width: 0;
 }
 
 .tag-input {

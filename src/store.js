@@ -4,7 +4,9 @@
 //   "descriptor" - adjectives:  "this card is ..."   (e.g. calm, ominous)
 //   "content"    - nouns:       "this card has ..."  (e.g. a dog, two people)
 //
-// Shape: { [cardId]: { descriptor: string[], content: string[] } }
+// Shape: { [cardId]: { descriptor: string[], content: string[], multiple: string[] } }
+// `multiple` is the subset of that card's contents shown more than once ("dogs" rather than
+// "a dog"); the tag text itself stays shared. Descriptors have no count.
 // The set of "existing tags" is derived from the card tags, so a tag disappears
 // automatically once no card uses it. The same text may exist as both kinds.
 
@@ -13,6 +15,8 @@ export const KINDS = ["descriptor", "content"];
 const KEY = "tarot-memory:tags:v2";
 const LEGACY_KEY = "tarot-memory:tags:v1"; // { [cardId]: string[] }, before kinds existed
 const NO_TAGS = Object.freeze([]);
+
+const emptyEntry = () => ({ descriptor: [], content: [], multiple: [] });
 
 export const normalizeTag = (raw) => raw.trim().replace(/\s+/g, " ").toLowerCase();
 
@@ -24,7 +28,10 @@ export function sanitizeTags(parsed) {
   const out = {};
   for (const [id, entry] of Object.entries(parsed ?? {})) {
     const cleaned = Object.fromEntries(KINDS.map((kind) => [kind, cleanList(entry?.[kind])]));
-    if (KINDS.some((kind) => cleaned[kind].length)) out[id] = cleaned;
+    if (!KINDS.some((kind) => cleaned[kind].length)) continue;
+    // Only contents already on the card can be flagged multiple.
+    cleaned.multiple = cleanList(entry?.multiple).filter((t) => cleaned.content.includes(t));
+    out[id] = cleaned;
   }
   return out;
 }
@@ -70,6 +77,15 @@ function load() {
   return {};
 }
 
+/** True if nothing has ever been saved (no tags key, no legacy key): a first visit or cleared site data. */
+export function isUninitialized() {
+  try {
+    return localStorage.getItem(KEY) === null && localStorage.getItem(LEGACY_KEY) === null;
+  } catch {
+    return false; // storage unavailable: don't nag about setup we can't persist
+  }
+}
+
 let state = load();
 const listeners = new Set();
 
@@ -90,6 +106,19 @@ export const subscribe = (fn) => (listeners.add(fn), () => listeners.delete(fn))
 
 export const getCardTags = (id, kind) => state[id]?.[kind] ?? NO_TAGS;
 
+/** True if this content tag is flagged as "multiple" on this card. */
+export const isMultiple = (id, tag) => state[id]?.multiple.includes(tag) ?? false;
+
+/** Flip a card's content tag between one and multiple. Returns the new value, or null if the card lacks the tag. */
+export function toggleMultiple(id, tag) {
+  const entry = state[id];
+  if (!entry?.content.includes(tag)) return null;
+  const now = !entry.multiple.includes(tag);
+  state = { ...state, [id]: { ...entry, multiple: now ? [...entry.multiple, tag] : entry.multiple.filter((t) => t !== tag) } };
+  commit();
+  return now;
+}
+
 /** True if the card has at least one tag of any kind. */
 export const isTagged = (id) => Object.hasOwn(state, id);
 
@@ -98,7 +127,7 @@ export function addTag(id, kind, raw) {
   if (!KINDS.includes(kind)) return null;
   const tag = normalizeTag(raw);
   if (!tag || getCardTags(id, kind).includes(tag)) return null;
-  const entry = state[id] ?? { descriptor: [], content: [] };
+  const entry = state[id] ?? emptyEntry();
   state = { ...state, [id]: { ...entry, [kind]: [...entry[kind], tag] } };
   commit();
   return tag;
@@ -108,6 +137,7 @@ export function removeTag(id, kind, tag) {
   const entry = state[id];
   if (!entry || !entry[kind]?.includes(tag)) return;
   const nextEntry = { ...entry, [kind]: entry[kind].filter((t) => t !== tag) };
+  if (kind === "content") nextEntry.multiple = entry.multiple.filter((t) => t !== tag);
   const { [id]: _removed, ...rest } = state;
   state = KINDS.some((k) => nextEntry[k].length) ? { ...rest, [id]: nextEntry } : rest;
   commit();
@@ -126,7 +156,10 @@ export function renameTag(kind, from, raw) {
   for (const [id, entry] of Object.entries(state)) {
     if (entry[kind].includes(from)) {
       changed = true;
-      next[id] = { ...entry, [kind]: [...new Set(entry[kind].map((t) => (t === from ? to : t)))] };
+      const swap = (list) => [...new Set(list.map((t) => (t === from ? to : t)))];
+      next[id] = { ...entry, [kind]: swap(entry[kind]) };
+      // On a merge, the card keeps "multiple" if either tag had it.
+      if (kind === "content") next[id].multiple = swap(entry.multiple);
     } else {
       next[id] = entry;
     }
@@ -149,6 +182,7 @@ export function deleteTag(kind, tag) {
     }
     affected++;
     const updated = { ...entry, [kind]: entry[kind].filter((t) => t !== tag) };
+    if (kind === "content") updated.multiple = entry.multiple.filter((t) => t !== tag);
     if (KINDS.some((k) => updated[k].length)) next[id] = updated;
   }
   if (affected) {
@@ -169,12 +203,17 @@ export function importTags(incoming, mode) {
   } else {
     const next = { ...state };
     for (const [id, entry] of Object.entries(clean)) {
-      const current = next[id] ?? { descriptor: [], content: [] };
-      next[id] = Object.fromEntries(KINDS.map((k) => [k, [...new Set([...current[k], ...entry[k]])]]));
+      const current = next[id] ?? emptyEntry();
+      next[id] = Object.fromEntries([...KINDS, "multiple"].map((k) => [k, [...new Set([...current[k], ...entry[k]])]]));
     }
     state = next;
   }
   commit();
+}
+
+/** Record that setup is done (with whatever tags exist, possibly none) so it isn't offered again. */
+export function markInitialized() {
+  save(state);
 }
 
 export function clearAllTags() {

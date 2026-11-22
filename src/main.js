@@ -2,7 +2,8 @@ import { CARDS, imageUrl } from "./cards.js";
 import { el } from "./dom.js";
 import { openContextMenu, openDialog } from "./overlays.js";
 import * as store from "./store.js";
-import { buildExport, parseImport } from "./transfer.js";
+import { countLabels } from "./words.js";
+import { buildExport, loadDefaultTags, parseImport } from "./transfer.js";
 
 // ---------- layouts ----------
 // A layout is a list of sections covering all 78 cards exactly once:
@@ -107,17 +108,17 @@ function loadLayout() {
 const KIND_UI = {
   descriptor: {
     noun: "descriptor",
+    groupTitle: "Descriptors",
     filterLabel: "Is…",
     filterHint: "Descriptors: this card is…",
-    addLabel: "+ Add descriptor",
     newLabel: "New descriptor…",
     placeholder: "e.g. calm, then Enter",
   },
   content: {
     noun: "content",
+    groupTitle: "Contents",
     filterLabel: "Has…",
     filterHint: "Contents: this card has…",
-    addLabel: "+ Add content",
     newLabel: "New content…",
     placeholder: "e.g. a dog, then Enter",
   },
@@ -131,12 +132,13 @@ const taggedCardCount = () => CARDS.filter((c) => store.isTagged(c.id)).length;
 
 const filter = {
   selected: Object.fromEntries(KINDS.map((k) => [k, new Set()])), // kind -> Set of tags
+  count: new Map(), // content tag -> "one" | "multiple"; a selected tag with no entry matches either
   mode: "all",
 };
 let layout = { ...DEFAULT_LAYOUT }; // { major, minor }: chosen option per layout group
 const selectedCount = () => KINDS.reduce((n, k) => n + filter.selected[k].size, 0);
 
-const cardRefs = new Map(); // card.id -> { card, figure, tagsEl, addEls: { [kind]: select|input } }
+const cardRefs = new Map(); // card.id -> { card, figure, tagsEl, addEls: { [kind]: button|input } }
 const sectionRefs = []; // current layout's card sections: { section, countEl, cards, keepSlots, pinned, shown }
 let minorGroup = null; // { countEl, sections }: the "Minor Arcana" heading's running count
 let toolbar; // refs to toolbar elements
@@ -166,11 +168,25 @@ function buildCard(card) {
 function renderCardTags(ref) {
   const { card } = ref;
   const groups = KINDS.map((kind) => {
-    const chips = store.getCardTags(card.id, kind).map((tag) =>
-      el(
+    const chips = store.getCardTags(card.id, kind).map((tag) => {
+      const multiple = kind === "content" && store.isMultiple(card.id, tag);
+      return el(
         "span",
-        { class: "tag" },
+        { class: `tag${multiple ? " tag--multiple" : ""}` },
         tag,
+        kind === "content" &&
+          el(
+            "button",
+            {
+              type: "button",
+              class: "tag-count",
+              title: multiple ? `Multiple "${tag}". Click to change to one.` : `One "${tag}". Click to change to multiple.`,
+              "aria-label": `${tag} on ${card.name}: ${multiple ? "multiple" : "one"}. Toggle.`,
+              "aria-pressed": String(multiple),
+              onClick: () => store.toggleMultiple(card.id, tag),
+            },
+            multiple ? "2+" : "1",
+          ),
         el(
           "button",
           {
@@ -182,38 +198,46 @@ function renderCardTags(ref) {
           },
           "×",
         ),
-      ),
+      );
+    });
+    ref.addEls[kind] = buildAddButton(ref, kind);
+    return el(
+      "div",
+      { class: `tag-group kind-${kind}` },
+      el("h4", { class: "tag-group-title" }, KIND_UI[kind].groupTitle),
+      el("div", { class: "tag-list" }, ...chips, ref.addEls[kind]),
     );
-    ref.addEls[kind] = buildAddSelect(ref, kind);
-    return el("div", { class: `tag-group kind-${kind}` }, ...chips, ref.addEls[kind]);
   });
   ref.tagsEl.replaceChildren(...groups);
 }
 
-/** Dropdown of existing tags of this kind (minus ones already on the card) plus a "New…" entry. */
-function buildAddSelect(ref, kind) {
+/** The small "+" button that opens a menu of existing tags of this kind (minus ones already on the card) plus "New…". */
+function buildAddButton(ref, kind) {
   const { card } = ref;
   const ui = KIND_UI[kind];
-  const mine = store.getCardTags(card.id, kind);
-  const available = store.getTagCounts(kind).map((t) => t.tag).filter((t) => !mine.includes(t));
-
-  const select = el(
-    "select",
-    { class: "tag-add", "aria-label": `Add ${ui.noun} to ${card.name}` },
-    el("option", {}, ui.addLabel),
-    ...available.map((t) => el("option", { value: t }, t)),
-    el("option", {}, ui.newLabel),
+  const button = el(
+    "button",
+    {
+      type: "button",
+      class: "tag-add",
+      title: `Add ${ui.noun}`,
+      "aria-label": `Add ${ui.noun} to ${card.name}`,
+      "aria-haspopup": "menu",
+      onClick: () => {
+        const mine = store.getCardTags(card.id, kind);
+        const available = store.getTagCounts(kind).map((t) => t.tag).filter((t) => !mine.includes(t));
+        const rect = button.getBoundingClientRect();
+        openContextMenu(rect.left, rect.bottom + 4, [
+          ...available.map((tag) => ({ label: tag, onSelect: () => commitTag(ref, kind, tag) })),
+          { label: ui.newLabel, accent: true, separator: available.length > 0, onSelect: () => startNewTag(ref, kind, button) },
+        ]);
+      },
+    },
   );
-  select.addEventListener("change", () => {
-    const i = select.selectedIndex;
-    if (i === 0) return;
-    if (i === select.options.length - 1) startNewTag(ref, kind, select);
-    else commitTag(ref, kind, select.value);
-  });
-  return select;
+  return button;
 }
 
-function startNewTag(ref, kind, select) {
+function startNewTag(ref, kind, addButton) {
   const ui = KIND_UI[kind];
   const input = el("input", {
     type: "text",
@@ -237,7 +261,7 @@ function startNewTag(ref, kind, select) {
   });
   input.addEventListener("blur", () => finish(false));
 
-  select.replaceWith(input);
+  addButton.replaceWith(input);
   ref.addEls[kind] = input;
   input.focus();
 }
@@ -273,10 +297,12 @@ async function renameTagFlow(kind, tag) {
   if (!result) return;
 
   const wasSelected = filter.selected[kind].has(tag);
+  const wasCount = kind === "content" ? filter.count.get(tag) : undefined;
   const renamed = store.renameTag(kind, tag, result.input);
   if (renamed && wasSelected) {
     // The store's update already dropped the old name from the filter; carry the selection over.
     filter.selected[kind].add(renamed);
+    if (wasCount) filter.count.set(renamed, wasCount);
     updateFilterUI();
   }
 }
@@ -304,7 +330,7 @@ function exportTags() {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-async function importTagsFromFile(file) {
+async function importTagsFromFile(file, { firstRun = false } = {}) {
   const problem = (message) =>
     openDialog({ title: "Can't import that file", message, cancelLabel: "OK" });
 
@@ -316,6 +342,7 @@ async function importTagsFromFile(file) {
   }
   const parsed = parseImport(text);
   if (!parsed.ok) return problem(parsed.error);
+  if (firstRun) return store.importTags(parsed.tags, "replace"); // nothing to merge with or lose
 
   const existing = taggedCardCount();
   const skipped = parsed.ignored ? ` ${plural(parsed.ignored, "entry")} for unknown cards will be skipped.` : "";
@@ -345,7 +372,13 @@ async function clearTagsFlow() {
 // ---------- filters ----------
 
 function matches(card) {
-  const picks = KINDS.flatMap((k) => [...filter.selected[k]].map((t) => store.getCardTags(card.id, k).includes(t)));
+  const picks = KINDS.flatMap((k) =>
+    [...filter.selected[k]].map((t) => {
+      if (!store.getCardTags(card.id, k).includes(t)) return false;
+      const want = k === "content" ? filter.count.get(t) : undefined;
+      return !want || store.isMultiple(card.id, t) === (want === "multiple");
+    }),
+  );
   if (picks.length === 0) return true;
   return filter.mode === "all" ? picks.every(Boolean) : picks.some(Boolean);
 }
@@ -417,27 +450,56 @@ function setMode(mode) {
 
 function clearFilters() {
   KINDS.forEach((k) => filter.selected[k].clear());
+  filter.count.clear();
   updateFilterUI();
 }
 
-function toggleTagFilter(kind, tag) {
+// Descriptor chips toggle. A content chip opens a menu to pick the count (any / one / multiple);
+// clicking it again turns the filter off.
+function toggleTagFilter(kind, tag, chip) {
   const set = filter.selected[kind];
-  if (!set.delete(tag)) set.add(tag);
+  if (set.has(tag)) {
+    set.delete(tag);
+    filter.count.delete(tag);
+  } else if (kind === "content") {
+    const labels = countLabels(tag);
+    const choose = (mode) => {
+      set.add(tag);
+      if (mode) filter.count.set(tag, mode);
+      else filter.count.delete(tag);
+      updateFilterUI();
+    };
+    const rect = chip.getBoundingClientRect();
+    openContextMenu(rect.left, rect.bottom + 4, [
+      { label: labels.any, onSelect: () => choose(null) },
+      { label: labels.one, onSelect: () => choose("one") },
+      { label: labels.multiple, onSelect: () => choose("multiple") },
+    ]);
+    return;
+  } else {
+    set.add(tag);
+  }
   updateFilterUI();
 }
 
 function tagFilterChip(kind, tag, count) {
+  const selected = filter.selected[kind].has(tag);
+  const label = kind === "content" && selected ? countLabels(tag)[filter.count.get(tag) ?? "any"] : tag;
   return el(
     "button",
     {
       type: "button",
       class: "chip",
-      title: "Click to filter. Right-click to rename or delete.",
-      "aria-pressed": String(filter.selected[kind].has(tag)),
-      onClick: () => toggleTagFilter(kind, tag),
+      title:
+        kind === "content"
+          ? "Click to choose how many (any, one, multiple), or to turn off. Right-click to rename or delete."
+          : "Click to filter. Right-click to rename or delete.",
+      "aria-pressed": String(selected),
+      ...(kind === "content" && !selected ? { "aria-haspopup": "menu" } : {}),
+      onClick: (e) => toggleTagFilter(kind, tag, e.currentTarget),
       onContextMenu: (e) => showTagMenu(e, kind, tag, count),
     },
-    tag,
+    label,
     el("span", { class: "chip-count" }, String(count)),
   );
 }
@@ -447,7 +509,11 @@ function updateFilterUI() {
   for (const kind of KINDS) {
     const counts = store.getTagCounts(kind);
     // A selected tag that no card uses anymore can't be toggled off in the UI; drop it.
-    for (const t of [...filter.selected[kind]]) if (!counts.some((c) => c.tag === t)) filter.selected[kind].delete(t);
+    for (const t of [...filter.selected[kind]]) {
+      if (counts.some((c) => c.tag === t)) continue;
+      filter.selected[kind].delete(t);
+      if (kind === "content") filter.count.delete(t);
+    }
 
     const chips = counts.map(({ tag, count }) => tagFilterChip(kind, tag, count));
     if (chips.length === 0) chips.push(el("span", { class: "muted" }, "none yet"));
@@ -574,6 +640,30 @@ function render() {
 }
 
 render();
+
+// First visit (nothing saved yet): load the bundled defaults, or ask for a file to import.
+async function firstRunSetup() {
+  if (!store.isUninitialized()) return;
+  const defaults = await loadDefaultTags();
+  if (defaults) return store.importTags(defaults.tags, "replace");
+
+  const result = await openDialog({
+    title: "Welcome! Import your tags?",
+    message:
+      "No default tags were found. If you have a tags file exported from this app, choose it now to get started. " +
+      "Otherwise, skip this and tag cards yourself; you can import a file any time with Import tags.",
+    actions: [{ label: "Choose file...", value: "choose", kind: "primary" }],
+    cancelLabel: "Skip",
+  });
+  if (!result) return store.markInitialized(); // skipped: don't ask again
+  const input = el("input", { type: "file", accept: "application/json,.json" });
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file) importTagsFromFile(file, { firstRun: true });
+  });
+  input.click();
+}
+firstRunSetup();
 
 // Any tag change (including from another tab): refresh every card's tag UI, then the filters.
 store.subscribe(() => {
