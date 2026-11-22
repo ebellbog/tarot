@@ -1,0 +1,530 @@
+:root {
+  --bg: #14101f;
+  --surface: #1e1830;
+  --text: #ece6f5;
+  --muted: #9d93b5;
+  --accent: #d9b45a;
+  --kind: var(--accent); /* overridden per tag kind below */
+  color-scheme: dark;
+}
+
+/* Tag kinds: descriptors ("is...") are gold, contents ("has...") are teal. */
+.kind-descriptor {
+  --kind: #d9b45a;
+}
+
+.kind-content {
+  --kind: #5fc4b4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.4;
+}
+
+.site-header {
+  position: relative; /* anchors .header-actions */
+  text-align: center;
+  padding: 3rem 1rem 1rem;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: normal;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ffffff1a;
+}
+
+.count {
+  font-size: 0.75em;
+  color: var(--muted);
+  margin-left: 0.4em;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------- toolbar ---------- */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #14101fee;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #ffffff1a;
+}
+
+.toolbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.chip-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.chip-group-label {
+  flex: none;
+  width: 2.2rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  color: var(--kind);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 4.6rem;
+  overflow-y: auto;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid #ffffff2e;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--kind);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--kind);
+  border-color: var(--kind);
+  color: #1a1426;
+}
+
+.chip-count {
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+.toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Export / Import / Clear: top-right corner of the page; a centered row under the title when narrow */
+.header-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.header-actions .button {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .header-actions {
+    position: static;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+}
+
+/* "Showing x of y cards": centered on its own line, last row of the sticky toolbar */
+.status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Layout toggle: sits right under a section heading's divider */
+.layout-toggle {
+  display: flex;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Suit / rank headings inside the "Minor Arcana" section */
+h3 {
+  margin: 2rem 0 0.8rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: normal;
+  font-size: 1.15rem;
+}
+
+h3 .count {
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-left: 0.4em;
+}
+
+.mode.is-inactive {
+  opacity: 0.5;
+}
+
+.seg {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid #ffffff2e;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.seg:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.seg:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.seg + .seg {
+  margin-left: -0.4rem; /* cancel the flex gap so the buttons touch */
+}
+
+.seg[aria-pressed="true"] {
+  background: #ffffff26;
+  color: var(--text);
+}
+
+.button {
+  --btn: var(--accent);
+  padding: 0.25rem 0.8rem;
+  border: 1px solid var(--btn);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--btn);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled),
+.button--primary {
+  background: var(--btn);
+  color: #1a1426;
+}
+
+.button--primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.button--danger {
+  --btn: #e5706b;
+}
+
+.button--ghost {
+  --btn: #ffffff59;
+  color: var(--text);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- dialog & context menu ---------- */
+
+.dialog {
+  width: min(28rem, 90vw);
+  padding: 1.25rem 1.4rem;
+  border: 1px solid #ffffff2e;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.dialog::backdrop {
+  background: #000a;
+}
+
+.dialog h3 {
+  margin: 0 0 0.6rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: normal;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.dialog-message {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+.dialog-input {
+  display: block;
+  width: 100%;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 12rem;
+  padding: 0.25rem;
+  border: 1px solid #ffffff2e;
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px #000a;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  text-align: left;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.context-menu button:hover,
+.context-menu button:focus-visible {
+  background: #ffffff1a;
+  outline: none;
+}
+
+.context-menu .danger {
+  color: #e5706b;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ---------- grid & cards ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.section-note {
+  max-width: 60rem;
+  margin: -0.4rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* Pollack layout: the Fool alone on top, then 3 rows x 7 columns sharing one column definition.
+   On narrow screens the grid scrolls sideways instead of squeezing the cards. */
+.threes {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.threes-inner {
+  min-width: calc(7 * 150px + 6 * 1rem);
+}
+
+.threes-fool,
+.threes-rows {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.threes-fool {
+  margin-bottom: 1rem;
+}
+
+.threes-fool > .card {
+  grid-column: 4; /* centered above the middle column */
+}
+
+.card--dimmed {
+  opacity: 0.22;
+  filter: grayscale(0.7);
+}
+
+.card--dimmed:hover {
+  opacity: 0.6;
+}
+
+.card {
+  margin: 0;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px #0008;
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 330 / 570;
+  background: #2a2340;
+}
+
+.card figcaption {
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.card-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0 0.5rem 0.6rem;
+}
+
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.2rem 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--kind) 18%, transparent);
+  color: var(--kind);
+  font-size: 0.75rem;
+}
+
+.tag-remove {
+  width: 1.2rem;
+  height: 1.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.tag-remove:hover {
+  opacity: 1;
+  background: #ffffff26;
+}
+
+.tag-add,
+.tag-input {
+  width: 100%;
+  padding: 0.25rem 0.4rem;
+  border: 1px dashed #ffffff40;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.tag-add option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.tag-input {
+  border-style: solid;
+  border-color: var(--kind);
+  color: var(--text);
+}
+
+.card--broken img {
+  visibility: hidden;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 2rem 1rem 3rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.site-footer a {
+  color: var(--accent);
+}

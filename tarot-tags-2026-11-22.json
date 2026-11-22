@@ -1,0 +1,141 @@
+{
+  "version": 2,
+  "exportedAt": "2026-11-22T21:36:19.456Z",
+  "cards": {
+    "rws_tarot_00_fool": {
+      "name": "The Fool",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "dogs"
+      ]
+    },
+    "rws_tarot_08_strength": {
+      "name": "Strength",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "rws_tarot_10_wheel_of_fortune": {
+      "name": "Wheel of Fortune",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "rws_tarot_13_death": {
+      "name": "Death",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "horses"
+      ]
+    },
+    "rws_tarot_18_moon": {
+      "name": "The Moon",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "dogs"
+      ]
+    },
+    "rws_tarot_19_sun": {
+      "name": "The Sun",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "rws_tarot_21_world": {
+      "name": "The World",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "wands06": {
+      "name": "Six of Wands",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "horses"
+      ]
+    },
+    "wands12": {
+      "name": "Knight of Wands",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "horses"
+      ]
+    },
+    "wands13": {
+      "name": "Queen of Wands",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "wands14": {
+      "name": "King of Wands",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "cups01": {
+      "name": "Ace of Cups",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "cups07": {
+      "name": "Seven of Cups",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "cups12": {
+      "name": "Knight of Cups",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "horses"
+      ]
+    },
+    "swords12": {
+      "name": "Knight of Swords",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "horses"
+      ]
+    },
+    "pents09": {
+      "name": "Nine of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "animals"
+      ]
+    },
+    "pents10": {
+      "name": "Ten of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "dogs"
+      ]
+    },
+    "pents12": {
+      "name": "Knight of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "animals",
+        "horses"
+      ]
+    }
+  }
+}
