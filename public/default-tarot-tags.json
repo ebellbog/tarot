@@ -1,13 +1,86 @@
 {
   "version": 2,
-  "exportedAt": "2026-11-22T23:52:38.936Z",
+  "exportedAt": "2026-11-23T06:29:30.930Z",
   "cards": {
     "rws_tarot_00_fool": {
       "name": "The Fool",
       "descriptors": [],
       "contents": [
         "animal",
-        "dog"
+        "dog",
+        "celestial body",
+        "person"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_01_magician": {
+      "name": "The Magician",
+      "descriptors": [],
+      "contents": [
+        "halo",
+        "infinity symbol",
+        "person"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_02_high_priestess": {
+      "name": "The High Priestess",
+      "descriptors": [
+        "indoors"
+      ],
+      "contents": [
+        "letter",
+        "person"
+      ],
+      "multiples": [
+        "letter"
+      ]
+    },
+    "rws_tarot_03_empress": {
+      "name": "The Empress",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_04_emperor": {
+      "name": "The Emperor",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_05_hierophant": {
+      "name": "The Hierophant",
+      "descriptors": [
+        "indoors"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "rws_tarot_06_lovers": {
+      "name": "The Lovers",
+      "descriptors": [],
+      "contents": [
+        "angel",
+        "celestial body",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "rws_tarot_07_chariot": {
+      "name": "The Chariot",
+      "descriptors": [],
+      "contents": [
+        "person"
       ],
       "multiples": []
     },
@@ -17,7 +90,18 @@
       "contents": [
         "animal",
         "cat",
-        "lion"
+        "lion",
+        "halo",
+        "infinity symbol",
+        "person"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_09_hermit": {
+      "name": "The Hermit",
+      "descriptors": [],
+      "contents": [
+        "person"
       ],
       "multiples": []
     },
@@ -25,18 +109,90 @@
       "name": "Wheel of Fortune",
       "descriptors": [],
       "contents": [
-        "animal"
+        "animal",
+        "angel",
+        "letter"
       ],
       "multiples": [
-        "animal"
+        "animal",
+        "letter"
       ]
+    },
+    "rws_tarot_11_justice": {
+      "name": "Justice",
+      "descriptors": [
+        "indoors"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_12_hanged_man": {
+      "name": "The Hanged Man",
+      "descriptors": [],
+      "contents": [
+        "halo",
+        "person"
+      ],
+      "multiples": []
     },
     "rws_tarot_13_death": {
       "name": "Death",
-      "descriptors": [],
+      "descriptors": [
+        "negative"
+      ],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "rws_tarot_14_temperance": {
+      "name": "Temperance",
+      "descriptors": [],
+      "contents": [
+        "angel",
+        "halo",
+        "celestial body"
+      ],
+      "multiples": []
+    },
+    "rws_tarot_15_devil": {
+      "name": "The Devil",
+      "descriptors": [
+        "negative",
+        "dark"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "rws_tarot_16_tower": {
+      "name": "The Tower",
+      "descriptors": [
+        "negative",
+        "dark"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "rws_tarot_17_star": {
+      "name": "The Star",
+      "descriptors": [],
+      "contents": [
+        "celestial body",
+        "person"
       ],
       "multiples": []
     },
@@ -45,7 +201,8 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "dog"
+        "dog",
+        "celestial body"
       ],
       "multiples": [
         "animal",
@@ -57,18 +214,69 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "celestial body",
+        "person"
       ],
       "multiples": []
+    },
+    "rws_tarot_20_judgement": {
+      "name": "Judgement",
+      "descriptors": [],
+      "contents": [
+        "angel",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
     },
     "rws_tarot_21_world": {
       "name": "The World",
       "descriptors": [],
       "contents": [
-        "animal"
+        "animal",
+        "person"
       ],
       "multiples": [
         "animal"
+      ]
+    },
+    "wands02": {
+      "name": "Two of Wands",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "wands03": {
+      "name": "Three of Wands",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "wands04": {
+      "name": "Four of Wands",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "wands05": {
+      "name": "Five of Wands",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
       ]
     },
     "wands06": {
@@ -76,7 +284,44 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "wands07": {
+      "name": "Seven of Wands",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "wands09": {
+      "name": "Nine of Wands",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": []
+    },
+    "wands10": {
+      "name": "Ten of Wands",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": []
+    },
+    "wands11": {
+      "name": "Page of Wands",
+      "descriptors": [],
+      "contents": [
+        "person"
       ],
       "multiples": []
     },
@@ -85,7 +330,8 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "person"
       ],
       "multiples": []
     },
@@ -94,7 +340,8 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "cat"
+        "cat",
+        "person"
       ],
       "multiples": []
     },
@@ -102,7 +349,8 @@
       "name": "King of Wands",
       "descriptors": [],
       "contents": [
-        "animal"
+        "animal",
+        "person"
       ],
       "multiples": []
     },
@@ -110,15 +358,102 @@
       "name": "Ace of Cups",
       "descriptors": [],
       "contents": [
-        "animal"
+        "animal",
+        "letter"
       ],
       "multiples": []
+    },
+    "cups02": {
+      "name": "Two of Cups",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "cups03": {
+      "name": "Three of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "cups04": {
+      "name": "Four of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups05": {
+      "name": "Five of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups06": {
+      "name": "Six of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
     },
     "cups07": {
       "name": "Seven of Cups",
       "descriptors": [],
       "contents": [
-        "animal"
+        "animal",
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups08": {
+      "name": "Eight of Cups",
+      "descriptors": [],
+      "contents": [
+        "celestial body",
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups09": {
+      "name": "Nine of Cups",
+      "descriptors": [
+        "indoors"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups10": {
+      "name": "Ten of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "cups11": {
+      "name": "Page of Cups",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
       ],
       "multiples": []
     },
@@ -127,7 +462,108 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups13": {
+      "name": "Queen of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "cups14": {
+      "name": "King of Cups",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords02": {
+      "name": "Two of Swords",
+      "descriptors": [],
+      "contents": [
+        "celestial body",
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords04": {
+      "name": "Four of Swords",
+      "descriptors": [
+        "indoors"
+      ],
+      "contents": [],
+      "multiples": []
+    },
+    "swords05": {
+      "name": "Five of Swords",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "swords06": {
+      "name": "Six of Swords",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "swords07": {
+      "name": "Seven of Swords",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords08": {
+      "name": "Eight of Swords",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords09": {
+      "name": "Nine of Swords",
+      "descriptors": [
+        "indoors",
+        "dark"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords10": {
+      "name": "Ten of Swords",
+      "descriptors": [
+        "dark"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords11": {
+      "name": "Page of Swords",
+      "descriptors": [],
+      "contents": [
+        "person"
       ],
       "multiples": []
     },
@@ -136,7 +572,93 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords13": {
+      "name": "Queen of Swords",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "swords14": {
+      "name": "King of Swords",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "pents02": {
+      "name": "Two of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "infinity symbol",
+        "stage",
+        "person"
+      ],
+      "multiples": []
+    },
+    "pents03": {
+      "name": "Three of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "pents04": {
+      "name": "Four of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": []
+    },
+    "pents05": {
+      "name": "Five of Pentacles",
+      "descriptors": [
+        "dark"
+      ],
+      "contents": [
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "pents06": {
+      "name": "Six of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
+      ],
+      "multiples": [
+        "person"
+      ]
+    },
+    "pents07": {
+      "name": "Seven of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "pents08": {
+      "name": "Eight of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "stage",
+        "person"
       ],
       "multiples": []
     },
@@ -144,7 +666,8 @@
       "name": "Nine of Pentacles",
       "descriptors": [],
       "contents": [
-        "animal"
+        "animal",
+        "person"
       ],
       "multiples": []
     },
@@ -153,19 +676,46 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "dog"
+        "dog",
+        "person"
       ],
       "multiples": [
         "animal",
-        "dog"
+        "dog",
+        "person"
       ]
+    },
+    "pents11": {
+      "name": "Page of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
     },
     "pents12": {
       "name": "Knight of Pentacles",
       "descriptors": [],
       "contents": [
         "animal",
-        "horse"
+        "horse",
+        "person"
+      ],
+      "multiples": []
+    },
+    "pents13": {
+      "name": "Queen of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "person"
+      ],
+      "multiples": []
+    },
+    "pents14": {
+      "name": "King of Pentacles",
+      "descriptors": [],
+      "contents": [
+        "person"
       ],
       "multiples": []
     }

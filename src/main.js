@@ -228,9 +228,19 @@ function buildAddButton(ref, kind) {
         const mine = store.getCardTags(card.id, kind);
         const available = store.getTagCounts(kind).map((t) => t.tag).filter((t) => !mine.includes(t));
         const rect = button.getBoundingClientRect();
+        // "New…" first, then the 3 most recently added tags, then everything else alphabetically.
+        const recent = recentTags[kind].filter((t) => available.includes(t)).slice(0, RECENT_SHOWN);
+        const rest = available.filter((t) => !recent.includes(t));
+        const item = (tag) => ({ label: tag, onSelect: () => commitTag(ref, kind, tag) });
         openContextMenu(rect.left, rect.bottom + 4, [
-          ...available.map((tag) => ({ label: tag, onSelect: () => commitTag(ref, kind, tag) })),
-          { label: ui.newLabel, accent: true, separator: available.length > 0, onSelect: () => startNewTag(ref, kind, button) },
+          { label: ui.newLabel, accent: true, onSelect: () => startNewTag(ref, kind, button) },
+          ...(recent.length ? [{ heading: "Recent" }, ...recent.map(item)] : []),
+          // With no "Recent" section there's no heading to draw the rule under "New…", so the first tag does.
+          ...(rest.length
+            ? recent.length
+              ? [{ heading: "All" }, ...rest.map(item)]
+              : rest.map((tag, i) => ({ ...item(tag), separator: i === 0 }))
+            : []),
         ]);
       },
     },
@@ -267,9 +277,32 @@ function startNewTag(ref, kind, addButton) {
   input.focus();
 }
 
+// Most recently added tags per kind (newest first), remembered across visits for the add menus.
+const RECENT_KEY = "tarot-memory:recent:v1";
+const RECENT_SHOWN = 3;
+const recentTags = (() => {
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(RECENT_KEY));
+  } catch {
+    /* none saved, or unreadable */
+  }
+  return Object.fromEntries(KINDS.map((k) => [k, Array.isArray(saved?.[k]) ? saved[k].filter((t) => typeof t === "string") : []]));
+})();
+
+function rememberRecent(kind, tag) {
+  recentTags[kind] = [tag, ...recentTags[kind].filter((t) => t !== tag)].slice(0, 10); // spare room: some may be on the card already
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recentTags));
+  } catch {
+    /* recents are a nicety; ignore */
+  }
+}
+
 /** Add a tag, then put focus back on that add control so tagging can continue by keyboard. */
 function commitTag(ref, kind, raw) {
-  store.addTag(ref.card.id, kind, raw); // notifies subscribers, which re-render
+  const added = store.addTag(ref.card.id, kind, raw); // notifies subscribers, which re-render
+  if (added) rememberRecent(kind, added);
   renderCardTags(ref); // also covers the no-op case (duplicate tag)
   ref.addEls[kind].focus();
 }
@@ -320,11 +353,31 @@ async function deleteTagFlow(kind, tag, count) {
 
 // ---------- import / export / clear ----------
 
-function exportTags() {
-  const blob = new Blob([JSON.stringify(buildExport(), null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const date = new Date().toISOString().slice(0, 10);
-  const a = el("a", { href: url, download: `tarot-tags-${date}.json` });
+// Prefer a real "Save as" dialog (Chromium browsers), which lets you pick a folder and overwrite an
+// existing file such as public/default-tarot-tags.json. Elsewhere, fall back to a plain download.
+async function exportTags() {
+  const json = JSON.stringify(buildExport(), null, 2);
+  const name = `tarot-tags-${new Date().toISOString().slice(0, 10)}.json`;
+
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        id: "tarot-tags-export", // the browser remembers the last folder used for this id
+        suggestedName: name,
+        types: [{ description: "Tarot tags (JSON)", accept: { "application/json": [".json"] } }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      return;
+    } catch (err) {
+      if (err?.name === "AbortError") return; // cancelled the dialog
+      console.warn("Save dialog failed, downloading instead:", err);
+    }
+  }
+
+  const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+  const a = el("a", { href: url, download: name });
   document.body.append(a);
   a.click();
   a.remove();
