@@ -338,7 +338,10 @@ h3 .count {
 }
 
 .context-menu button {
-  display: block;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
   width: 100%;
   padding: 0.4rem 0.7rem;
   border: 0;
@@ -353,6 +356,12 @@ h3 .count {
 .context-menu button:focus-visible {
   background: #ffffff1a;
   outline: none;
+}
+
+.context-menu .hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .context-menu .danger {

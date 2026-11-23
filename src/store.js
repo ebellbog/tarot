@@ -222,11 +222,19 @@ export function clearAllTags() {
   commit();
 }
 
-/** Tags of one kind that are in use, alphabetical, with the number of cards using each. */
+/**
+ * Tags of one kind that are in use, alphabetical, with the number of cards using each.
+ * For contents, `multiple` is how many of those cards flag the tag as multiple (0 for descriptors).
+ */
 export function getTagCounts(kind) {
   const counts = new Map();
   for (const entry of Object.values(state)) {
-    for (const t of entry[kind]) counts.set(t, (counts.get(t) ?? 0) + 1);
+    for (const t of entry[kind]) {
+      const c = counts.get(t) ?? { count: 0, multiple: 0 };
+      c.count++;
+      if (kind === "content" && entry.multiple.includes(t)) c.multiple++;
+      counts.set(t, c);
+    }
   }
-  return [...counts].map(([tag, count]) => ({ tag, count })).sort((a, b) => a.tag.localeCompare(b.tag));
+  return [...counts].map(([tag, c]) => ({ tag, ...c })).sort((a, b) => a.tag.localeCompare(b.tag));
 }

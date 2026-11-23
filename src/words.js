@@ -20,5 +20,5 @@ export function countForms(tag) {
 /** Option labels and filter-chip text for each count mode. */
 export function countLabels(tag) {
   const { singular, plural } = countForms(tag);
-  return { any: `any number of ${plural}`, one: `one ${singular}`, multiple: `multiple ${plural}` };
+  return { any: `any ${plural}`, one: `one ${singular}`, multiple: `multiple ${plural}`, none: `no ${plural}` };
 }

@@ -132,7 +132,8 @@ const taggedCardCount = () => CARDS.filter((c) => store.isTagged(c.id)).length;
 
 const filter = {
   selected: Object.fromEntries(KINDS.map((k) => [k, new Set()])), // kind -> Set of tags
-  count: new Map(), // content tag -> "one" | "multiple"; a selected tag with no entry matches either
+  // Per kind: tag -> "one" | "multiple" (contents only) | "none" (negated). A selected tag with no entry just means "has it".
+  variant: Object.fromEntries(KINDS.map((k) => [k, new Map()])),
   mode: "all",
 };
 let layout = { ...DEFAULT_LAYOUT }; // { major, minor }: chosen option per layout group
@@ -297,12 +298,12 @@ async function renameTagFlow(kind, tag) {
   if (!result) return;
 
   const wasSelected = filter.selected[kind].has(tag);
-  const wasCount = kind === "content" ? filter.count.get(tag) : undefined;
+  const wasVariant = filter.variant[kind].get(tag);
   const renamed = store.renameTag(kind, tag, result.input);
   if (renamed && wasSelected) {
     // The store's update already dropped the old name from the filter; carry the selection over.
     filter.selected[kind].add(renamed);
-    if (wasCount) filter.count.set(renamed, wasCount);
+    if (wasVariant) filter.variant[kind].set(renamed, wasVariant);
     updateFilterUI();
   }
 }
@@ -374,9 +375,10 @@ async function clearTagsFlow() {
 function matches(card) {
   const picks = KINDS.flatMap((k) =>
     [...filter.selected[k]].map((t) => {
-      if (!store.getCardTags(card.id, k).includes(t)) return false;
-      const want = k === "content" ? filter.count.get(t) : undefined;
-      return !want || store.isMultiple(card.id, t) === (want === "multiple");
+      const has = store.getCardTags(card.id, k).includes(t);
+      const want = filter.variant[k].get(t);
+      if (want === "none") return !has;
+      return has && (!want || store.isMultiple(card.id, t) === (want === "multiple"));
     }),
   );
   if (picks.length === 0) return true;
@@ -450,41 +452,52 @@ function setMode(mode) {
 
 function clearFilters() {
   KINDS.forEach((k) => filter.selected[k].clear());
-  filter.count.clear();
+  KINDS.forEach((k) => filter.variant[k].clear());
   updateFilterUI();
 }
 
-// Descriptor chips toggle. A content chip opens a menu to pick the count (any / one / multiple);
-// clicking it again turns the filter off.
-function toggleTagFilter(kind, tag, chip) {
+// Clicking a chip opens a menu of how to filter on it; clicking it again turns the filter off.
+//   content:    any / one / multiple / none   ("one" and "multiple" only if some card has the tag that way)
+//   descriptor: is / is not
+function toggleTagFilter(kind, tag, chip, stats) {
   const set = filter.selected[kind];
   if (set.has(tag)) {
     set.delete(tag);
-    filter.count.delete(tag);
-  } else if (kind === "content") {
-    const labels = countLabels(tag);
-    const choose = (mode) => {
-      set.add(tag);
-      if (mode) filter.count.set(tag, mode);
-      else filter.count.delete(tag);
-      updateFilterUI();
-    };
-    const rect = chip.getBoundingClientRect();
-    openContextMenu(rect.left, rect.bottom + 4, [
-      { label: labels.any, onSelect: () => choose(null) },
-      { label: labels.one, onSelect: () => choose("one") },
-      { label: labels.multiple, onSelect: () => choose("multiple") },
-    ]);
+    filter.variant[kind].delete(tag);
+    updateFilterUI();
     return;
-  } else {
-    set.add(tag);
   }
-  updateFilterUI();
+  const choose = (variant) => {
+    set.add(tag);
+    if (variant) filter.variant[kind].set(tag, variant);
+    else filter.variant[kind].delete(tag);
+    updateFilterUI();
+  };
+  let options;
+  if (kind === "content") {
+    const labels = countLabels(tag);
+    options = [
+      { label: labels.none, hint: "= 0", onSelect: () => choose("none") },
+      { label: labels.any, hint: "> 0", onSelect: () => choose(null) },
+      stats.count > stats.multiple && { label: labels.one, hint: "= 1", onSelect: () => choose("one") },
+      stats.multiple > 0 && { label: labels.multiple, hint: "> 1", onSelect: () => choose("multiple") },
+    ];
+  } else {
+    options = [
+      { label: tag, onSelect: () => choose(null) },
+      { label: `not ${tag}`, onSelect: () => choose("none") },
+    ];
+  }
+  const rect = chip.getBoundingClientRect();
+  openContextMenu(rect.left, rect.bottom + 4, options.filter(Boolean));
 }
 
-function tagFilterChip(kind, tag, count) {
+function tagFilterChip(kind, tag, stats) {
+  const { count } = stats;
   const selected = filter.selected[kind].has(tag);
-  const label = kind === "content" && selected ? countLabels(tag)[filter.count.get(tag) ?? "any"] : tag;
+  const variant = filter.variant[kind].get(tag);
+  const label =
+    kind === "content" ? (selected ? countLabels(tag)[variant ?? "any"] : tag) : variant === "none" ? `not ${tag}` : tag;
   return el(
     "button",
     {
@@ -492,11 +505,11 @@ function tagFilterChip(kind, tag, count) {
       class: "chip",
       title:
         kind === "content"
-          ? "Click to choose how many (any, one, multiple), or to turn off. Right-click to rename or delete."
-          : "Click to filter. Right-click to rename or delete.",
+          ? "Click to choose how many (any, one, multiple, none), or to turn off. Right-click to rename or delete."
+          : "Click to filter by it, or exclude it. Click again to turn off. Right-click to rename or delete.",
       "aria-pressed": String(selected),
-      ...(kind === "content" && !selected ? { "aria-haspopup": "menu" } : {}),
-      onClick: (e) => toggleTagFilter(kind, tag, e.currentTarget),
+      ...(!selected ? { "aria-haspopup": "menu" } : {}),
+      onClick: (e) => toggleTagFilter(kind, tag, e.currentTarget, stats),
       onContextMenu: (e) => showTagMenu(e, kind, tag, count),
     },
     label,
@@ -512,10 +525,10 @@ function updateFilterUI() {
     for (const t of [...filter.selected[kind]]) {
       if (counts.some((c) => c.tag === t)) continue;
       filter.selected[kind].delete(t);
-      if (kind === "content") filter.count.delete(t);
+      filter.variant[kind].delete(t);
     }
 
-    const chips = counts.map(({ tag, count }) => tagFilterChip(kind, tag, count));
+    const chips = counts.map((stats) => tagFilterChip(kind, stats.tag, stats));
     if (chips.length === 0) chips.push(el("span", { class: "muted" }, "none yet"));
     toolbar.groups[kind].replaceChildren(...chips);
   }

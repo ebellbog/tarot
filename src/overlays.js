@@ -73,7 +73,7 @@ export function closeContextMenu({ restoreFocus = false } = {}) {
   if (restoreFocus && opener?.isConnected) opener.focus();
 }
 
-/** Open a menu at viewport coordinates. items: [{ label, onSelect, danger?, accent?, separator? }] (separator: rule above) */
+/** Open a menu at viewport coordinates. items: [{ label, onSelect, hint?, danger?, accent?, separator? }] (hint: muted text at the right edge) (separator: rule above) */
 export function openContextMenu(x, y, items) {
   closeContextMenu();
   const opener = document.activeElement;
@@ -94,6 +94,7 @@ export function openContextMenu(x, y, items) {
           },
         },
         item.label,
+        item.hint && el("span", { class: "hint" }, item.hint),
       ),
     ),
   );
