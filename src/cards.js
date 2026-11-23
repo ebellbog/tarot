@@ -94,6 +94,13 @@ const BASE = "https://upload.wikimedia.org/wikipedia/commons";
 /** @param {{ file: string, hash: string }} card @param {number} width Standard Commons thumb width (250, 330, 500, 960, ...) */
 export const imageUrl = (card, width) => `${BASE}/thumb/${card.hash}/${card.file}/${width}px-${card.file}`;
 
+/**
+ * The deck's original 1909 card back (roses and lilies; public domain). This is the uncropped scan: the
+ * "cropped" file on Commons trims into the card's edges. Same thumb URL scheme as imageUrl.
+ */
+const BACK_FILE = "Waite%E2%80%93Smith_Tarot_Roses_and_Lilies.jpg";
+export const cardBackUrl = (width) => `${BASE}/thumb/0/0b/${BACK_FILE}/${width}px-${BACK_FILE}`;
+
 export const commonsPageUrl = (card) => `https://commons.wikimedia.org/wiki/File:${card.file}`;
 
 export const CARDS = RAW_CARDS.map((c) => ({ ...c, id: c.file.replace(/\.jpg$/, "").toLowerCase() }));

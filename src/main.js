@@ -1,8 +1,9 @@
 import { CARDS, imageUrl } from "./cards.js";
 import { el } from "./dom.js";
+import { createGame, playableCards } from "./game.js";
 import { openContextMenu, openDialog } from "./overlays.js";
 import * as store from "./store.js";
-import { countLabels } from "./words.js";
+import { countLabels, plural } from "./words.js";
 import { buildExport, loadDefaultTags, parseImport } from "./transfer.js";
 
 // ---------- layouts ----------
@@ -125,7 +126,6 @@ const KIND_UI = {
 };
 const KINDS = store.KINDS;
 
-const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const taggedCardCount = () => CARDS.filter((c) => store.isTagged(c.id)).length;
 
 // ---------- state ----------
@@ -707,6 +707,33 @@ function render() {
 
 render();
 
+// ---------- test mode ----------
+
+const game = createGame();
+document.getElementById("app").after(game.root);
+let testing = false;
+const testBtn = el("button", { type: "button", class: "button", onClick: () => setTesting(!testing) });
+document.getElementById("mode-actions").append(testBtn);
+
+function setTesting(on) {
+  testing = on;
+  for (const id of ["toolbar", "app", "actions"]) document.getElementById(id).hidden = on;
+  game.root.hidden = !on;
+  if (on) game.start();
+  updateTestButton();
+  window.scrollTo(0, 0);
+}
+
+function updateTestButton() {
+  testBtn.textContent = testing ? "← Back" : "Test my knowledge!";
+  testBtn.classList.toggle("button--danger", testing); // red while in test mode, green otherwise
+  testBtn.classList.toggle("button--content", !testing);
+  const playable = playableCards().length > 0;
+  testBtn.disabled = !testing && !playable;
+  testBtn.title = !testing && !playable ? "Tag some cards first (or import tags): the secret card is picked from tagged cards." : "";
+}
+updateTestButton();
+
 // First visit (nothing saved yet): load the bundled defaults, or ask for a file to import.
 async function firstRunSetup() {
   if (!store.isUninitialized()) return;
@@ -735,4 +762,5 @@ firstRunSetup();
 store.subscribe(() => {
   for (const ref of cardRefs.values()) renderCardTags(ref);
   updateFilterUI();
+  updateTestButton();
 });

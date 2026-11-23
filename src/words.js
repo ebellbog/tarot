@@ -22,3 +22,6 @@ export function countLabels(tag) {
   const { singular, plural } = countForms(tag);
   return { any: `any ${plural}`, one: `one ${singular}`, multiple: `multiple ${plural}`, none: `no ${plural}` };
 }
+
+/** "1 guess", "2 guesses", "3 tagged cards" */
+export const plural = (n, word) => `${n} ${pluralize(word, n)}`;
