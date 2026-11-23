@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "exportedAt": "2026-11-23T06:29:30.930Z",
+  "exportedAt": "2026-11-23T23:13:10.850Z",
   "cards": {
     "rws_tarot_00_fool": {
       "name": "The Fool",
@@ -9,7 +9,8 @@
         "animal",
         "dog",
         "celestial body",
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -30,7 +31,8 @@
       ],
       "contents": [
         "letter",
-        "person"
+        "person",
+        "celestial body"
       ],
       "multiples": [
         "letter"
@@ -40,7 +42,8 @@
       "name": "The Empress",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water"
       ],
       "multiples": []
     },
@@ -70,7 +73,8 @@
       "contents": [
         "angel",
         "celestial body",
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": [
         "person"
@@ -93,7 +97,8 @@
         "lion",
         "halo",
         "infinity symbol",
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -101,7 +106,8 @@
       "name": "The Hermit",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "snow"
       ],
       "multiples": []
     },
@@ -145,7 +151,9 @@
       "contents": [
         "animal",
         "horse",
-        "person"
+        "person",
+        "water",
+        "celestial body"
       ],
       "multiples": [
         "person"
@@ -157,7 +165,9 @@
       "contents": [
         "angel",
         "halo",
-        "celestial body"
+        "celestial body",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -192,7 +202,9 @@
       "descriptors": [],
       "contents": [
         "celestial body",
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -202,7 +214,9 @@
       "contents": [
         "animal",
         "dog",
-        "celestial body"
+        "celestial body",
+        "water",
+        "mountain"
       ],
       "multiples": [
         "animal",
@@ -225,7 +239,9 @@
       "descriptors": [],
       "contents": [
         "angel",
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": [
         "person"
@@ -242,11 +258,22 @@
         "animal"
       ]
     },
+    "wands01": {
+      "name": "Ace of Wands",
+      "descriptors": [],
+      "contents": [
+        "water",
+        "mountain"
+      ],
+      "multiples": []
+    },
     "wands02": {
       "name": "Two of Wands",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -254,7 +281,8 @@
       "name": "Three of Wands",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -299,6 +327,14 @@
       ],
       "multiples": []
     },
+    "wands08": {
+      "name": "Eight of Wands",
+      "descriptors": [],
+      "contents": [
+        "water"
+      ],
+      "multiples": []
+    },
     "wands09": {
       "name": "Nine of Wands",
       "descriptors": [],
@@ -321,7 +357,8 @@
       "name": "Page of Wands",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -331,7 +368,8 @@
       "contents": [
         "animal",
         "horse",
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -359,7 +397,8 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "letter"
+        "letter",
+        "water"
       ],
       "multiples": []
     },
@@ -396,7 +435,8 @@
       "name": "Five of Cups",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water"
       ],
       "multiples": []
     },
@@ -424,7 +464,9 @@
       "descriptors": [],
       "contents": [
         "celestial body",
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -442,7 +484,8 @@
       "name": "Ten of Cups",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water"
       ],
       "multiples": [
         "person"
@@ -463,7 +506,9 @@
       "contents": [
         "animal",
         "horse",
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -471,7 +516,8 @@
       "name": "Queen of Cups",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water"
       ],
       "multiples": []
     },
@@ -479,7 +525,16 @@
       "name": "King of Cups",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water"
+      ],
+      "multiples": []
+    },
+    "swords01": {
+      "name": "Ace of Swords",
+      "descriptors": [],
+      "contents": [
+        "mountain"
       ],
       "multiples": []
     },
@@ -488,7 +543,18 @@
       "descriptors": [],
       "contents": [
         "celestial body",
-        "person"
+        "person",
+        "water"
+      ],
+      "multiples": []
+    },
+    "swords03": {
+      "name": "Three of Swords",
+      "descriptors": [
+        "negative"
+      ],
+      "contents": [
+        "water"
       ],
       "multiples": []
     },
@@ -505,7 +571,8 @@
       "descriptors": [],
       "contents": [
         "stage",
-        "person"
+        "person",
+        "water"
       ],
       "multiples": [
         "person"
@@ -515,7 +582,8 @@
       "name": "Six of Swords",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water"
       ],
       "multiples": [
         "person"
@@ -534,7 +602,9 @@
       "name": "Eight of Swords",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -542,7 +612,8 @@
       "name": "Nine of Swords",
       "descriptors": [
         "indoors",
-        "dark"
+        "dark",
+        "negative"
       ],
       "contents": [
         "person"
@@ -552,10 +623,13 @@
     "swords10": {
       "name": "Ten of Swords",
       "descriptors": [
-        "dark"
+        "dark",
+        "negative"
       ],
       "contents": [
-        "person"
+        "person",
+        "water",
+        "mountain"
       ],
       "multiples": []
     },
@@ -599,7 +673,8 @@
       "contents": [
         "infinity symbol",
         "stage",
-        "person"
+        "person",
+        "water"
       ],
       "multiples": []
     },
@@ -628,7 +703,8 @@
         "dark"
       ],
       "contents": [
-        "person"
+        "person",
+        "snow"
       ],
       "multiples": [
         "person"
@@ -649,7 +725,8 @@
       "name": "Seven of Pentacles",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -689,7 +766,8 @@
       "name": "Page of Pentacles",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },
@@ -707,7 +785,8 @@
       "name": "Queen of Pentacles",
       "descriptors": [],
       "contents": [
-        "person"
+        "person",
+        "mountain"
       ],
       "multiples": []
     },

@@ -3,19 +3,19 @@
 // Questions are built from the tags only (no suit / number / arcana, which would make it too easy):
 //   content:    "Does this card contain [any | one | multiple] [content]?"
 //   descriptor: "Is this card [quality]?"   (qualities are the descriptor tags)
-// The secret card is chosen at random from cards that have at least one tag.
+// The secret card is chosen at random from cards that have at least one tag. Question logic and the
+// "best question" solver live in questions.js.
 
 import { CARDS, cardBackUrl, imageUrl } from "./cards.js";
 import { el } from "./dom.js";
 import { openContextMenu, openDialog } from "./overlays.js";
 import * as store from "./store.js";
-import { countForms, countLabels, plural } from "./words.js";
+import { AMOUNTS, answerQuestion, bestQuestion, questionText, remainingCards, split } from "./questions.js";
+import { countForms, plural } from "./words.js";
 
-const AMOUNTS = [
-  { value: "any", label: "any" },
-  { value: "one", label: "one" },
-  { value: "multiple", label: "multiple" },
-];
+// "Show splits" checkbox: annotate question options with how they divide the remaining cards (yes / no).
+const SPLITS_KEY = "tarot-memory:game-splits:v1";
+let showSplits = localStorage.getItem(SPLITS_KEY) === "1";
 
 const GUESS_GROUPS = [
   ["Major Arcana", (c) => c.arcana === "major"],
@@ -25,17 +25,6 @@ const GUESS_GROUPS = [
   ["Pentacles", (c) => c.suit === "pentacles"],
 ];
 
-/** The yes/no answer for `card`. question: { kind: "content", amount, tag } | { kind: "descriptor", tag } */
-export function answerQuestion(card, q) {
-  if (q.kind === "descriptor") return store.getCardTags(card.id, "descriptor").includes(q.tag);
-  if (!store.getCardTags(card.id, "content").includes(q.tag)) return false;
-  if (q.amount === "any") return true;
-  return store.isMultiple(card.id, q.tag) === (q.amount === "multiple");
-}
-
-export const questionText = (q) =>
-  q.kind === "content" ? `Does this card contain ${countLabels(q.tag)[q.amount]}?` : `Is this card ${q.tag}?`;
-
 /** Cards the game can pick as the secret: those with at least one tag. */
 export const playableCards = () => CARDS.filter((c) => store.isTagged(c.id));
 
@@ -43,8 +32,8 @@ export function createGame() {
   const root = el("section", { class: "game", hidden: true, "aria-label": "Test my knowledge" });
 
   // Everything about the current round lives here.
-  // { secret, log: [{ text, answer }], guesses: [{ card, correct }], draft: null | "content" | "descriptor",
-  //   repeated: text of a just-repeated question, solved, revealed (gave up and looked) }
+  // { secret, pool: cards the secret could be, log: [{ q, text, answer }] (newest first), guesses: [{ card, correct }],
+  //   draft: null | "content" | "descriptor", repeated: text of a just-repeated question, solved, revealed (gave up) }
   let g = null;
   let previousSecretId = null;
 
@@ -53,7 +42,7 @@ export function createGame() {
     const choices = pool.length > 1 ? pool.filter((c) => c.id !== previousSecretId) : pool;
     const secret = choices[Math.floor(Math.random() * choices.length)];
     previousSecretId = secret?.id ?? null;
-    g = { secret, log: [], guesses: [], draft: null, repeated: null, solved: false, revealed: false };
+    g = { secret, pool, log: [], guesses: [], draft: null, repeated: null, solved: false, revealed: false };
   }
 
   function start() {
@@ -63,12 +52,28 @@ export function createGame() {
 
   // ---------- asking ----------
 
+  /** Cards still consistent with everything learned so far (never peeks at the secret). */
+  const remaining = () =>
+    remainingCards(g.pool, g.log, new Set(g.guesses.filter((x) => !x.correct).map((x) => x.card.id)));
+
+  /** "3 / 20" (yes / no among the remaining cards) when splits are shown, else undefined. */
+  const splitHint = (q) => {
+    if (!showSplits) return undefined;
+    const { yes, no } = split(remaining(), q);
+    return `${yes} / ${no}`;
+  };
+
+  function askBest() {
+    const best = bestQuestion(remaining());
+    if (best) ask(best.q);
+  }
+
   function ask(q) {
     const text = questionText(q);
     if (g.log.some((e) => e.text === text)) {
       g.repeated = text; // asking again doesn't count against you; the existing row flashes instead
     } else {
-      g.log.unshift({ text, answer: answerQuestion(g.secret, q) });
+      g.log.unshift({ q, text, answer: answerQuestion(g.secret, q) });
       g.repeated = null;
     }
     g.draft = null;
@@ -119,6 +124,7 @@ export function createGame() {
             ? item
             : {
                 label: item.label,
+                hint: item.hint,
                 onSelect: () => {
                   button.value = item.value;
                   text.textContent = item.label;
@@ -136,14 +142,23 @@ export function createGame() {
   function buildForm(kind) {
     const changed = () => (askBtn.disabled = !ready());
     // Contents read as "one dog" / "any dogs" / "multiple dogs", so their labels follow the amount chosen.
+    // Split hints for a content use the chosen amount ("any" until one is picked), and vice versa.
     const contentItems = () =>
       store.getTagCounts("content").map(({ tag }) => {
         const forms = countForms(tag);
-        return { value: tag, label: amount?.value === "one" ? forms.singular : forms.plural };
+        const how = amount.value || "any";
+        return {
+          value: tag,
+          label: how === "one" ? forms.singular : forms.plural,
+          hint: splitHint({ kind: "content", amount: how, tag }),
+        };
       });
-    const qualityItems = () => store.getTagCounts("descriptor").map(({ tag }) => ({ value: tag, label: tag }));
+    const amountItems = () =>
+      AMOUNTS.map((a) => ({ value: a, label: a, hint: tag.value ? splitHint({ kind: "content", amount: a, tag: tag.value }) : undefined }));
+    const qualityItems = () =>
+      store.getTagCounts("descriptor").map(({ tag }) => ({ value: tag, label: tag, hint: splitHint({ kind: "descriptor", tag }) }));
 
-    const amount = kind === "content" ? picker("How many", "choose…", AMOUNTS, () => (tag.sync(), changed())) : null;
+    const amount = kind === "content" ? picker("How many", "choose…", amountItems, () => (tag.sync(), changed())) : null;
     const tag = picker(kind === "content" ? "Content" : "Quality", "choose…", kind === "content" ? contentItems : qualityItems, changed);
     const askBtn = el("button", { type: "submit", class: "button button--primary", disabled: true }, "Ask");
     const cancelBtn = el("button", { type: "button", class: "button button--ghost", onClick: closeDraft }, "Cancel");
@@ -236,6 +251,45 @@ export function createGame() {
     return button;
   }
 
+  /** Asks whichever question splits the remaining cards most evenly. */
+  function bestButton() {
+    const none = !bestQuestion(remaining());
+    return el(
+      "button",
+      {
+        type: "button",
+        class: "button button--content game-ask game-ask-best",
+        disabled: none,
+        title: none
+          ? "No question can tell the remaining cards apart. Time to guess!"
+          : "Ask the question that splits the remaining cards most evenly (without peeking at the secret card)",
+        onClick: askBest,
+      },
+      "Ask best question",
+    );
+  }
+
+  function splitsToggle() {
+    const box = el("input", {
+      type: "checkbox",
+      checked: showSplits,
+      onChange: () => {
+        showSplits = box.checked;
+        try {
+          localStorage.setItem(SPLITS_KEY, showSplits ? "1" : "0");
+        } catch {
+          /* just a preference */
+        }
+      },
+    });
+    return el(
+      "label",
+      { class: "game-splits-toggle", title: "In the question dropdowns, show how many remaining cards would answer yes / no" },
+      box,
+      "Show how each option splits the remaining cards (yes / no)",
+    );
+  }
+
   function render() {
     const askable = (k) => store.getTagCounts(k).length > 0;
     const over = g.solved || g.revealed;
@@ -250,6 +304,8 @@ export function createGame() {
       el("span", {}, plural(g.log.length, "question")),
       " · ",
       el("span", {}, plural(g.guesses.length, "guess")),
+      !over && " · ",
+      !over && el("span", {}, `${plural(remaining().length, "possibility")} remaining`),
       el("button", { type: "button", class: "link-button", onClick: start }, over ? "Play again" : "Start over"),
     );
 
@@ -268,16 +324,22 @@ export function createGame() {
                   "div",
                   { class: "game-ask-buttons" },
                   el(
-                    "button",
-                    { type: "button", class: "button game-ask", disabled: !askable("content"), onClick: () => openDraft("content") },
-                    "Ask about content",
+                    "div",
+                    { class: "game-ask-row" },
+                    el(
+                      "button",
+                      { type: "button", class: "button game-ask", disabled: !askable("content"), onClick: () => openDraft("content") },
+                      "Ask about content",
+                    ),
+                    el(
+                      "button",
+                      { type: "button", class: "button game-ask", disabled: !askable("descriptor"), onClick: () => openDraft("descriptor") },
+                      "Ask about qualities",
+                    ),
                   ),
-                  el(
-                    "button",
-                    { type: "button", class: "button game-ask", disabled: !askable("descriptor"), onClick: () => openDraft("descriptor") },
-                    "Ask about qualities",
-                  ),
+                  bestButton(),
                 ),
+            splitsToggle(),
           );
 
     const history =

@@ -4,6 +4,8 @@ import { createGame, playableCards } from "./game.js";
 import { openContextMenu, openDialog } from "./overlays.js";
 import * as store from "./store.js";
 import { countLabels, plural } from "./words.js";
+import { identicalTagMap } from "./questions.js";
+import { openTreeDialog } from "./visualize.js";
 import { buildExport, loadDefaultTags, parseImport } from "./transfer.js";
 
 // ---------- layouts ----------
@@ -135,9 +137,18 @@ const filter = {
   // Per kind: tag -> "one" | "multiple" (contents only) | "none" (negated). A selected tag with no entry just means "has it".
   variant: Object.fromEntries(KINDS.map((k) => [k, new Map()])),
   mode: "all",
+  duplicatesOnly: false, // hide cards with a unique tag set (show untagged and identically-tagged cards)
 };
 let layout = { ...DEFAULT_LAYOUT }; // { major, minor }: chosen option per layout group
 const selectedCount = () => KINDS.reduce((n, k) => n + filter.selected[k].size, 0);
+const filtersActive = () => selectedCount() > 0 || filter.duplicatesOnly;
+
+// card.id -> other tagged cards with exactly the same tags. Rebuilt lazily after each tag change.
+let twinCache = null;
+function twinsOf(card) {
+  twinCache ??= identicalTagMap(CARDS.filter((c) => store.isTagged(c.id)));
+  return twinCache.get(card.id) ?? [];
+}
 
 const cardRefs = new Map(); // card.id -> { card, figure, tagsEl, addEls: { [kind]: button|input } }
 const sectionRefs = []; // current layout's card sections: { section, countEl, cards, keepSlots, pinned, shown }
@@ -209,7 +220,20 @@ function renderCardTags(ref) {
       el("div", { class: "tag-list" }, ...chips, ref.addEls[kind]),
     );
   });
-  ref.tagsEl.replaceChildren(...groups);
+  ref.tagsEl.replaceChildren(...[...groups, twinsFooter(card)].filter(Boolean));
+}
+
+/** "Unique" or "Same tags as n other cards" (untagged cards aren't in the game, so they get no footer). */
+function twinsFooter(card) {
+  if (!store.isTagged(card.id)) return null;
+  const twins = twinsOf(card);
+  return twins.length === 0
+    ? el("p", { class: "card-twins", title: "No other card has exactly these tags" }, "Unique")
+    : el(
+        "p",
+        { class: "card-twins is-duplicate", title: `No question can tell this card apart from: ${twins.map((c) => c.name).join(", ")}` },
+        `Same tags as ${plural(twins.length, "other card")}`,
+      );
 }
 
 /** The small "+" button that opens a menu of existing tags of this kind (minus ones already on the card) plus "New…". */
@@ -426,6 +450,8 @@ async function clearTagsFlow() {
 // ---------- filters ----------
 
 function matches(card) {
+  // "Only cards without unique tags": hide cards whose tags no other card shares (untagged cards stay).
+  if (filter.duplicatesOnly && store.isTagged(card.id) && twinsOf(card).length === 0) return false;
   const picks = KINDS.flatMap((k) =>
     [...filter.selected[k]].map((t) => {
       const has = store.getCardTags(card.id, k).includes(t);
@@ -466,15 +492,46 @@ function buildToolbar() {
       if (file) importTagsFromFile(file);
     },
   });
-  const exportBtn = el("button", { type: "button", class: "button", onClick: exportTags }, "Export tags");
-  const importBtn = el("button", { type: "button", class: "button", onClick: () => fileInput.click() }, "Import tags");
-  const clearTagsBtn = el("button", { type: "button", class: "button button--danger", onClick: clearTagsFlow }, "Clear tags");
+  // Export / Import / Clear share one "Manage tags" menu.
+  const manageBtn = el(
+    "button",
+    {
+      type: "button",
+      class: "button",
+      "aria-haspopup": "menu",
+      onClick: () => {
+        const hasTags = taggedCardCount() > 0;
+        const rect = manageBtn.getBoundingClientRect();
+        openContextMenu(rect.right, rect.bottom + 4, [
+          { label: "Export tags…", disabled: !hasTags, onSelect: exportTags },
+          { label: "Import tags…", onSelect: () => fileInput.click() },
+          { label: "Clear tags…", danger: true, separator: true, disabled: !hasTags, onSelect: clearTagsFlow },
+        ], { alignRight: true }); // it sits at the page's right edge
+      },
+    },
+    "Manage tags ▾",
+  );
+  const visualizeBtn = el("button", { type: "button", class: "button button--plain", onClick: openTreeDialog }, "Visualize data");
+
+  const duplicatesBox = el("input", {
+    type: "checkbox",
+    onChange: () => {
+      filter.duplicatesOnly = duplicatesBox.checked;
+      updateFilterUI();
+    },
+  });
+  const duplicatesToggle = el(
+    "label",
+    { class: "check-toggle", title: "Untagged cards, and cards whose tags exactly match another card's (no question can tell those apart)" },
+    duplicatesBox,
+    "Only cards without unique tags",
+  );
 
   // "Showing x of y cards": last row of the sticky toolbar, so it stays visible while scrolling.
   const status = el("div", { class: "status", role: "status" });
 
   // Data actions live in the page header's top-right corner (see #actions in index.html).
-  document.getElementById("actions").append(exportBtn, importBtn, clearTagsBtn, fileInput);
+  document.getElementById("actions").append(visualizeBtn, manageBtn, fileInput);
   document
     .getElementById("toolbar")
     .append(
@@ -482,7 +539,7 @@ function buildToolbar() {
         "div",
         { class: "toolbar-inner" },
         ...groupEls,
-        el("div", { class: "toolbar-row" }, modeGroup, clearFiltersBtn),
+        el("div", { class: "toolbar-row" }, modeGroup, duplicatesToggle, clearFiltersBtn),
         status,
       ),
     );
@@ -492,8 +549,8 @@ function buildToolbar() {
     modeAny,
     modeGroup,
     clearFiltersBtn,
-    exportBtn,
-    clearTagsBtn,
+    duplicatesBox,
+    visualizeBtn,
     status,
   };
 }
@@ -506,6 +563,7 @@ function setMode(mode) {
 function clearFilters() {
   KINDS.forEach((k) => filter.selected[k].clear());
   KINDS.forEach((k) => filter.variant[k].clear());
+  filter.duplicatesOnly = false;
   updateFilterUI();
 }
 
@@ -590,9 +648,9 @@ function updateFilterUI() {
   toolbar.modeAll.setAttribute("aria-pressed", String(filter.mode === "all"));
   toolbar.modeAny.setAttribute("aria-pressed", String(filter.mode === "any"));
   toolbar.modeGroup.classList.toggle("is-inactive", selectedCount() < 2);
-  toolbar.clearFiltersBtn.hidden = selectedCount() === 0;
-  toolbar.exportBtn.disabled = !hasTags;
-  toolbar.clearTagsBtn.disabled = !hasTags;
+  toolbar.clearFiltersBtn.hidden = !filtersActive();
+  toolbar.duplicatesBox.checked = filter.duplicatesOnly;
+  toolbar.visualizeBtn.disabled = !hasTags;
 
   // Every card belongs to exactly one section in every layout.
   let shown = 0;
@@ -760,6 +818,7 @@ firstRunSetup();
 
 // Any tag change (including from another tab): refresh every card's tag UI, then the filters.
 store.subscribe(() => {
+  twinCache = null;
   for (const ref of cardRefs.values()) renderCardTags(ref);
   updateFilterUI();
   updateTestButton();

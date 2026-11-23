@@ -73,8 +73,8 @@ export function closeContextMenu({ restoreFocus = false } = {}) {
   if (restoreFocus && opener?.isConnected) opener.focus();
 }
 
-/** Open a menu at viewport coordinates. items: [{ heading } (non-selectable section title) | { label, onSelect, hint?, danger?, accent?, separator? }] (hint: muted text at the right edge) (separator: rule above) */
-export function openContextMenu(x, y, items) {
+/** Open a menu at viewport coordinates (pass { alignRight: true } to hang it left from x). items: [{ heading } (non-selectable section title) | { label, onSelect, hint?, disabled?, danger?, accent?, separator? }] (hint: muted text at the right edge) (separator: rule above) */
+export function openContextMenu(x, y, items, { alignRight = false } = {}) {
   closeContextMenu();
   const opener = document.activeElement;
 
@@ -88,6 +88,7 @@ export function openContextMenu(x, y, items) {
         {
           type: "button",
           role: "menuitem",
+          disabled: Boolean(item.disabled),
           class: [item.danger && "danger", item.accent && "accent", item.separator && "separator"].filter(Boolean).join(" "),
           onClick: () => {
             closeContextMenu();
@@ -103,10 +104,13 @@ export function openContextMenu(x, y, items) {
 
   // Keep the menu fully on screen.
   const { width, height } = menu.getBoundingClientRect();
-  menu.style.left = `${Math.max(4, Math.min(x, window.innerWidth - width - 4))}px`;
-  menu.style.top = `${Math.max(4, Math.min(y, window.innerHeight - height - 4))}px`;
+  // clientWidth/Height exclude the scrollbar, which innerWidth/Height would let the menu slide under.
+  const { clientWidth, clientHeight } = document.documentElement;
+  const left = alignRight ? x - width : x; // alignRight: x is where the menu's right edge should go
+  menu.style.left = `${Math.max(4, Math.min(left, clientWidth - width - 4))}px`;
+  menu.style.top = `${Math.max(4, Math.min(y, clientHeight - height - 4))}px`;
 
-  const entries = [...menu.querySelectorAll("button")];
+  const entries = [...menu.querySelectorAll("button:not(:disabled)")];
   const onPointerDown = (e) => {
     if (!menu.contains(e.target)) closeContextMenu();
   };

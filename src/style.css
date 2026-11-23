@@ -39,7 +39,7 @@ body {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-weight: normal;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   color: var(--accent);
 }
 
@@ -153,6 +153,7 @@ input {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.9rem;
+  padding: 0.4em 0;
   font-size: 0.85rem;
   color: var(--muted);
 }
@@ -274,6 +275,10 @@ h3 .count {
 
 .button--content {
   --btn: #5fc4b4; /* the same green as the "Has…" tags (.kind-content) */
+}
+
+.button--plain {
+  --btn: var(--text);
 }
 
 .button--ghost {
@@ -497,6 +502,20 @@ h3 .count {
   padding: 0 0.5rem 0.6rem;
 }
 
+/* "Unique" / "Same tags as n other cards" */
+.card-twins {
+  margin: 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid #ffffff1f;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.card-twins.is-duplicate {
+  color: #e5706b;
+}
+
 .tag-group + .tag-group {
   padding-top: 0.55rem;
   border-top: 1px solid #ffffff1f;
@@ -676,7 +695,7 @@ h3 .count {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  transform: scale(1.015); /* trims the thin strip of scanner background around the card */
+  transform: scale(1.026) rotate(1deg); /* trims the thin strip of scanner background around the card */
   pointer-events: none; /* clicks go to the button */
 }
 
@@ -718,6 +737,34 @@ h3 .count {
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+}
+
+/* Two ask buttons side by side, with "Ask best question" on its own line below them. */
+.game-ask-buttons {
+  flex-direction: column;
+}
+
+.game-ask-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.check-toggle,
+.game-splits-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.check-toggle input,
+.game-splits-toggle input {
+  accent-color: #5fc4b4;
 }
 
 .game-form-actions {
@@ -841,4 +888,141 @@ h3 .count {
 .game-win h2 {
   margin: 1.25rem 0 0.5rem;
   color: var(--accent);
+}
+
+/* ---------- visualize data (decision tree) ---------- */
+
+.dialog--tree {
+  width: min(1200px, 95vw);
+  max-width: none;
+  height: 90vh;
+  max-height: none;
+}
+
+.dialog--tree[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tree-header h3 {
+  margin: 0;
+}
+
+.tree-summary,
+.tree-legend {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.tree-summary .is-group {
+  color: #e5706b;
+}
+
+.tree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+
+.tree-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 1.4rem;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  border-top: 2px solid;
+}
+
+.tree-legend .legend-yes::before {
+  border-color: #5fc4b4;
+}
+
+.tree-legend .legend-no::before {
+  border-top-style: dashed;
+  border-color: var(--muted);
+}
+
+.legend-group {
+  color: #e5706b;
+}
+
+.tree-scroll {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0.8rem;
+  overflow: auto;
+  border-top: 1px solid #ffffff1f;
+}
+
+.tree {
+  display: block;
+  font-size: 12px;
+}
+
+.tree text {
+  fill: var(--text);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.tree-edge {
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.tree-edge.is-yes {
+  stroke: #5fc4b4;
+}
+
+.tree-edge.is-no {
+  stroke: var(--muted);
+  stroke-dasharray: 4 3;
+}
+
+.tree-question circle {
+  fill: var(--accent);
+}
+
+.tree-question text {
+  fill: var(--accent);
+}
+
+.tree-leaf circle {
+  fill: var(--text);
+}
+
+.tree-leaf.is-group circle,
+.tree-bracket {
+  fill: #e5706b;
+  stroke: #e5706b;
+}
+
+.tree-bracket {
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.tree-leaf.is-group text {
+  fill: #e5706b;
+}
+
+/* toolbar "Only cards with duplicate tags" sits inline */
+.toolbar-row .check-toggle {
+  margin-top: 0;
+}
+
+.context-menu button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: none;
 }
