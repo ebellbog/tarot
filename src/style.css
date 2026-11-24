@@ -134,7 +134,7 @@ input {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  max-height: 4.6rem;
+  max-height: 6rem;
   overflow-y: auto;
 }
 
