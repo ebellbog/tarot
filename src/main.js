@@ -141,6 +141,9 @@ const filter = {
 };
 let layout = { ...DEFAULT_LAYOUT }; // { major, minor }: chosen option per layout group
 const selectedCount = () => KINDS.reduce((n, k) => n + filter.selected[k].size, 0);
+// The filter chips can be folded away, leaving just the "Showing x of y cards" line. Remembered between visits.
+const COLLAPSE_KEY = "tarot-memory:filters-collapsed:v1";
+let filtersCollapsed = localStorage.getItem(COLLAPSE_KEY) === "1";
 const filtersActive = () => selectedCount() > 0 || filter.duplicatesOnly;
 
 // card.id -> other tagged cards with exactly the same tags. Rebuilt lazily after each tag change.
@@ -529,6 +532,9 @@ function buildToolbar() {
 
   // "Showing x of y cards": last row of the sticky toolbar, so it stays visible while scrolling.
   const status = el("div", { class: "status", role: "status" });
+  const collapseBtn = el("button", { type: "button", class: "toolbar-toggle", onClick: toggleFiltersCollapsed });
+  const activeSummary = el("span", { class: "toolbar-active" }); // shown only while collapsed, since the chips are hidden then
+  const foot = el("div", { class: "toolbar-foot" }, status, activeSummary);
 
   // Data actions live in the page header's top-right corner (see #actions in index.html).
   document.getElementById("actions").append(visualizeBtn, manageBtn, fileInput);
@@ -538,9 +544,10 @@ function buildToolbar() {
       el(
         "div",
         { class: "toolbar-inner" },
+        collapseBtn,
         ...groupEls,
         el("div", { class: "toolbar-row" }, modeGroup, duplicatesToggle, clearFiltersBtn),
-        status,
+        foot,
       ),
     );
   return {
@@ -551,12 +558,24 @@ function buildToolbar() {
     clearFiltersBtn,
     duplicatesBox,
     visualizeBtn,
+    collapseBtn,
+    activeSummary,
     status,
   };
 }
 
 function setMode(mode) {
   filter.mode = mode;
+  updateFilterUI();
+}
+
+function toggleFiltersCollapsed() {
+  filtersCollapsed = !filtersCollapsed;
+  try {
+    localStorage.setItem(COLLAPSE_KEY, filtersCollapsed ? "1" : "0");
+  } catch {
+    /* just a preference */
+  }
   updateFilterUI();
 }
 
@@ -649,6 +668,12 @@ function updateFilterUI() {
   toolbar.modeAny.setAttribute("aria-pressed", String(filter.mode === "any"));
   toolbar.modeGroup.classList.toggle("is-inactive", selectedCount() < 2);
   toolbar.clearFiltersBtn.hidden = !filtersActive();
+  document.getElementById("toolbar").classList.toggle("is-collapsed", filtersCollapsed);
+  const active = selectedCount() + (filter.duplicatesOnly ? 1 : 0);
+  toolbar.collapseBtn.textContent = filtersCollapsed ? "▸" : "▾";
+  toolbar.collapseBtn.title = toolbar.collapseBtn.ariaLabel = filtersCollapsed ? "Show filters" : "Hide filters";
+  toolbar.collapseBtn.setAttribute("aria-expanded", String(!filtersCollapsed));
+  toolbar.activeSummary.textContent = filtersCollapsed && active ? `· ${plural(active, "filter")} active` : "";
   toolbar.duplicatesBox.checked = filter.duplicatesOnly;
   toolbar.visualizeBtn.disabled = !hasTags;
 
@@ -764,6 +789,12 @@ function render() {
 }
 
 render();
+
+// The filter toolbar sticks just below the pinned action bar, whose height changes when it wraps on narrow screens.
+const topbar = document.getElementById("topbar");
+const syncTopbarHeight = () => document.documentElement.style.setProperty("--topbar-h", `${topbar.offsetHeight}px`);
+new ResizeObserver(syncTopbarHeight).observe(topbar);
+syncTopbarHeight();
 
 // ---------- test mode ----------
 

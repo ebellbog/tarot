@@ -30,9 +30,24 @@ body {
 }
 
 .site-header {
-  position: relative; /* anchors .header-actions */
   text-align: center;
-  padding: 3rem 1rem 1rem;
+  padding: 1.5rem 1rem 1rem;
+}
+
+/* Action buttons stay pinned to the top of the screen; the filter toolbar sticks just below (--topbar-h). */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
+  background: #14101fee;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #ffffff33;
 }
 
 .site-header h1 {
@@ -83,17 +98,19 @@ input {
 
 .toolbar {
   position: sticky;
-  top: 0;
+  top: calc(var(--topbar-h, 0px) - 1px); /* overlaps the bar's bottom border, so the two draw as one line */
   z-index: 10;
   background: #14101fee;
   backdrop-filter: blur(6px);
+  border-top: 1px solid #ffffff33; /* separates the filters from the title above (and the pinned bar when stuck) */
   border-bottom: 1px solid #ffffff1a;
 }
 
 .toolbar-inner {
+  position: relative; /* anchors the disclosure caret */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.75rem 1rem;
+  padding: 2.75rem 1rem 0.75rem 3.25rem; /* left room for the caret, so it never overlaps the filters */
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -158,18 +175,10 @@ input {
   color: var(--muted);
 }
 
-/* Export / Import / Clear: top-right corner of the page; a centered row under the title when narrow */
 .header-actions {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.header-actions--left {
-  right: auto;
-  left: 1rem;
 }
 
 .header-actions .button {
@@ -177,11 +186,8 @@ input {
 }
 
 @media (max-width: 760px) {
-  .header-actions {
-    position: static;
+  .topbar {
     justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
   }
 }
 
@@ -190,6 +196,52 @@ input {
   text-align: center;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+/* Disclosure caret in the filter section's left gutter */
+.toolbar-toggle {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.6rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid #ffffff40;
+  border-radius: 6px;
+  background: #ffffff0d;
+  color: var(--text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.toolbar-toggle:hover,
+.toolbar-toggle:focus-visible {
+  border-color: var(--accent);
+  background: #ffffff1a;
+  color: var(--accent);
+}
+
+.toolbar-active {
+  color: var(--accent);
+}
+
+.toolbar-foot {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.85rem;
+}
+
+/* Collapsed: only the "Showing x of y cards" line and the Show filters link remain. */
+.toolbar.is-collapsed .chip-group,
+.toolbar.is-collapsed .toolbar-row {
+  display: none;
+}
+
+.toolbar.is-collapsed .toolbar-inner {
+  padding-top: 1em;
 }
 
 .mode {
