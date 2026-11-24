@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "exportedAt": "2026-11-24T02:46:57.286Z",
+  "exportedAt": "2026-11-24T03:05:52.756Z",
   "cards": {
     "rws_tarot_00_fool": {
       "name": "The Fool",
@@ -31,7 +31,7 @@
         "indoors"
       ],
       "contents": [
-        "letter",
+        "english letter",
         "person",
         "celestial body",
         "clearly gendered woman",
@@ -39,7 +39,7 @@
         "crowned subject"
       ],
       "multiples": [
-        "letter"
+        "english letter"
       ]
     },
     "rws_tarot_03_empress": {
@@ -91,7 +91,8 @@
         "clearly gendered man",
         "clearly gendered woman",
         "nude subject",
-        "cloud"
+        "cloud",
+        "mythological creature"
       ],
       "multiples": [
         "person",
@@ -106,9 +107,12 @@
         "city",
         "clearly gendered man",
         "crowned subject",
-        "armored subject"
+        "armored subject",
+        "mythological creature"
       ],
-      "multiples": []
+      "multiples": [
+        "mythological creature"
+      ]
     },
     "rws_tarot_08_strength": {
       "name": "Strength",
@@ -140,14 +144,16 @@
       "contents": [
         "animal",
         "angel",
-        "letter",
+        "english letter",
         "cloud",
-        "yud"
+        "yud",
+        "mythological creature"
       ],
       "multiples": [
         "animal",
-        "letter",
-        "cloud"
+        "english letter",
+        "cloud",
+        "mythological creature"
       ]
     },
     "rws_tarot_11_justice": {
@@ -186,7 +192,8 @@
         "clearly gendered man",
         "clearly gendered woman",
         "seated subject",
-        "armored subject"
+        "armored subject",
+        "mythological creature"
       ],
       "multiples": [
         "person",
@@ -202,7 +209,8 @@
         "angel",
         "halo",
         "celestial body",
-        "water"
+        "water",
+        "mythological creature"
       ],
       "multiples": []
     },
@@ -216,7 +224,8 @@
         "person",
         "clearly gendered man",
         "clearly gendered woman",
-        "nude subject"
+        "nude subject",
+        "mythological creature"
       ],
       "multiples": [
         "person",
@@ -290,7 +299,8 @@
         "water",
         "clearly gendered woman",
         "clearly gendered man",
-        "cloud"
+        "cloud",
+        "mythological creature"
       ],
       "multiples": [
         "person",
@@ -477,7 +487,7 @@
       "descriptors": [],
       "contents": [
         "animal",
-        "letter",
+        "english letter",
         "water",
         "cloud",
         "yud"
@@ -491,7 +501,8 @@
       "descriptors": [],
       "contents": [
         "stage",
-        "person"
+        "person",
+        "mythological creature"
       ],
       "multiples": [
         "person"
@@ -548,9 +559,12 @@
       "contents": [
         "animal",
         "person",
-        "cloud"
+        "cloud",
+        "mythological creature"
       ],
-      "multiples": []
+      "multiples": [
+        "mythological creature"
+      ]
     },
     "cups08": {
       "name": "Eight of Cups",
@@ -966,7 +980,8 @@
         "person",
         "clearly gendered woman",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "animal"
       ],
       "multiples": []
     },
