@@ -626,6 +626,11 @@ function tagFilterChip(kind, tag, stats) {
   const { count } = stats;
   const selected = filter.selected[kind].has(tag);
   const variant = filter.variant[kind].get(tag);
+  // While a filter is applied, the chip counts the cards that filter shows: only-one / only-multiple cards, or
+  // (for "no" / "not") every card without the tag, untagged ones included. Otherwise: cards that have the tag.
+  const active = selected ? variant : undefined;
+  const shownCount =
+    active === "none" ? CARDS.length - count : active === "multiple" ? stats.multiple : active === "one" ? count - stats.multiple : count;
   const label =
     kind === "content" ? (selected ? countLabels(tag)[variant ?? "any"] : tag) : variant === "none" ? `not ${tag}` : tag;
   return el(
@@ -643,7 +648,7 @@ function tagFilterChip(kind, tag, stats) {
       onContextMenu: (e) => showTagMenu(e, kind, tag, count),
     },
     label,
-    el("span", { class: "chip-count" }, String(count)),
+    el("span", { class: "chip-count" }, String(shownCount)),
   );
 }
 
@@ -814,7 +819,7 @@ function setTesting(on) {
 }
 
 function updateTestButton() {
-  testBtn.textContent = testing ? "← Back" : "Test my knowledge!";
+  testBtn.textContent = testing ? "← Back" : "Guess a card!";
   testBtn.classList.toggle("button--danger", testing); // red while in test mode, green otherwise
   testBtn.classList.toggle("button--content", !testing);
   const playable = playableCards().length > 0;

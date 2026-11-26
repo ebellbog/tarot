@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "exportedAt": "2026-11-24T03:05:52.756Z",
+  "exportedAt": "2026-11-26T20:44:18.736Z",
   "cards": {
     "rws_tarot_00_fool": {
       "name": "The Fool",
@@ -10,9 +10,12 @@
         "dog",
         "celestial body",
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "rws_tarot_01_magician": {
       "name": "The Magician",
@@ -21,14 +24,16 @@
         "halo",
         "infinity symbol",
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
     "rws_tarot_02_high_priestess": {
       "name": "The High Priestess",
       "descriptors": [
-        "indoors"
+        "indoors",
+        "symmetrical"
       ],
       "contents": [
         "english letter",
@@ -36,7 +41,8 @@
         "celestial body",
         "clearly gendered woman",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
       "multiples": [
         "english letter"
@@ -50,7 +56,8 @@
         "water",
         "clearly gendered woman",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
       "multiples": []
     },
@@ -61,20 +68,25 @@
         "person",
         "clearly gendered man",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "rws_tarot_05_hierophant": {
       "name": "The Hierophant",
       "descriptors": [
-        "indoors"
+        "indoors",
+        "symmetrical"
       ],
       "contents": [
         "person",
         "clearly gendered man",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
       "multiples": [
         "person",
@@ -83,7 +95,9 @@
     },
     "rws_tarot_06_lovers": {
       "name": "The Lovers",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "angel",
         "celestial body",
@@ -101,14 +115,17 @@
     },
     "rws_tarot_07_chariot": {
       "name": "The Chariot",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "person",
         "city",
         "clearly gendered man",
         "crowned subject",
         "armored subject",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ],
       "multiples": [
         "mythological creature"
@@ -134,26 +151,34 @@
       "contents": [
         "person",
         "snow",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "rws_tarot_10_wheel_of_fortune": {
       "name": "Wheel of Fortune",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "animal",
         "angel",
         "english letter",
         "cloud",
         "yud",
-        "mythological creature"
+        "mythological creature",
+        "bird",
+        "held object"
       ],
       "multiples": [
         "animal",
         "english letter",
         "cloud",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ]
     },
     "rws_tarot_11_justice": {
@@ -164,13 +189,18 @@
       "contents": [
         "person",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "rws_tarot_12_hanged_man": {
       "name": "The Hanged Man",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "halo",
         "person",
@@ -181,7 +211,7 @@
     "rws_tarot_13_death": {
       "name": "Death",
       "descriptors": [
-        "negative"
+        "ominous"
       ],
       "contents": [
         "animal",
@@ -193,7 +223,8 @@
         "clearly gendered woman",
         "seated subject",
         "armored subject",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ],
       "multiples": [
         "person",
@@ -210,22 +241,27 @@
         "halo",
         "celestial body",
         "water",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "rws_tarot_15_devil": {
       "name": "The Devil",
       "descriptors": [
-        "negative",
-        "dark"
+        "ominous",
+        "dark-colored",
+        "symmetrical"
       ],
       "contents": [
         "person",
         "clearly gendered man",
         "clearly gendered woman",
         "nude subject",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ],
       "multiples": [
         "person",
@@ -235,8 +271,9 @@
     "rws_tarot_16_tower": {
       "name": "The Tower",
       "descriptors": [
-        "negative",
-        "dark"
+        "ominous",
+        "dark-colored",
+        "symmetrical"
       ],
       "contents": [
         "person",
@@ -257,19 +294,26 @@
         "person",
         "water",
         "clearly gendered woman",
-        "nude subject"
+        "nude subject",
+        "bird",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "rws_tarot_18_moon": {
       "name": "The Moon",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "animal",
         "dog",
         "celestial body",
         "water",
-        "yud"
+        "yud",
+        "sea creature"
       ],
       "multiples": [
         "animal",
@@ -300,7 +344,8 @@
         "clearly gendered woman",
         "clearly gendered man",
         "cloud",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ],
       "multiples": [
         "person",
@@ -310,17 +355,22 @@
     },
     "rws_tarot_21_world": {
       "name": "The World",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "animal",
         "person",
         "clearly gendered woman",
         "nude subject",
-        "cloud"
+        "cloud",
+        "bird",
+        "held object"
       ],
       "multiples": [
         "animal",
-        "cloud"
+        "cloud",
+        "held object"
       ]
     },
     "wands01": {
@@ -330,7 +380,8 @@
         "water",
         "city",
         "cloud",
-        "yud"
+        "yud",
+        "held object"
       ],
       "multiples": [
         "yud"
@@ -343,9 +394,12 @@
         "person",
         "water",
         "city",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "wands03": {
       "name": "Three of Wands",
@@ -353,20 +407,25 @@
       "contents": [
         "person",
         "water",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
     "wands04": {
       "name": "Four of Wands",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "stage",
         "person",
-        "city"
+        "city",
+        "held object"
       ],
       "multiples": [
-        "person"
+        "person",
+        "held object"
       ]
     },
     "wands05": {
@@ -374,11 +433,13 @@
       "descriptors": [],
       "contents": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ]
     },
     "wands06": {
@@ -389,12 +450,14 @@
         "horse",
         "person",
         "clearly gendered man",
-        "seated subject"
+        "seated subject",
+        "held object"
       ],
       "multiples": [
         "person",
         "clearly gendered man",
-        "seated subject"
+        "seated subject",
+        "held object"
       ]
     },
     "wands07": {
@@ -402,7 +465,8 @@
       "descriptors": [],
       "contents": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
@@ -420,7 +484,8 @@
       "contents": [
         "stage",
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
@@ -431,16 +496,20 @@
         "stage",
         "person",
         "city",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "wands11": {
       "name": "Page of Wands",
       "descriptors": [],
       "contents": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
@@ -453,7 +522,8 @@
         "person",
         "clearly gendered man",
         "seated subject",
-        "armored subject"
+        "armored subject",
+        "held object"
       ],
       "multiples": []
     },
@@ -466,9 +536,12 @@
         "person",
         "clearly gendered woman",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "wands14": {
       "name": "King of Wands",
@@ -478,7 +551,8 @@
         "person",
         "clearly gendered man",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
       "multiples": []
     },
@@ -490,7 +564,9 @@
         "english letter",
         "water",
         "cloud",
-        "yud"
+        "yud",
+        "bird",
+        "held object"
       ],
       "multiples": [
         "yud"
@@ -498,26 +574,34 @@
     },
     "cups02": {
       "name": "Two of Cups",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "stage",
         "person",
-        "mythological creature"
+        "mythological creature",
+        "held object"
       ],
       "multiples": [
-        "person"
+        "person",
+        "held object"
       ]
     },
     "cups03": {
       "name": "Three of Cups",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "person",
-        "clearly gendered woman"
+        "clearly gendered woman",
+        "held object"
       ],
       "multiples": [
         "person",
-        "clearly gendered woman"
+        "clearly gendered woman",
+        "held object"
       ]
     },
     "cups04": {
@@ -527,7 +611,8 @@
         "person",
         "clearly gendered man",
         "seated subject",
-        "cloud"
+        "cloud",
+        "held object"
       ],
       "multiples": []
     },
@@ -547,7 +632,8 @@
       "contents": [
         "person",
         "city",
-        "clearly gendered woman"
+        "clearly gendered woman",
+        "held object"
       ],
       "multiples": [
         "person"
@@ -572,14 +658,16 @@
       "contents": [
         "celestial body",
         "person",
-        "water"
+        "water",
+        "held object"
       ],
       "multiples": []
     },
     "cups09": {
       "name": "Nine of Cups",
       "descriptors": [
-        "indoors"
+        "indoors",
+        "symmetrical"
       ],
       "contents": [
         "person",
@@ -609,7 +697,9 @@
       "contents": [
         "stage",
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object",
+        "sea creature"
       ],
       "multiples": []
     },
@@ -623,7 +713,8 @@
         "water",
         "clearly gendered man",
         "seated subject",
-        "armored subject"
+        "armored subject",
+        "held object"
       ],
       "multiples": []
     },
@@ -635,7 +726,8 @@
         "water",
         "clearly gendered woman",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
       "multiples": []
     },
@@ -647,9 +739,13 @@
         "water",
         "clearly gendered man",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object",
+        "sea creature"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "swords01": {
       "name": "Ace of Swords",
@@ -657,7 +753,8 @@
       "contents": [
         "crowned subject",
         "cloud",
-        "yud"
+        "yud",
+        "held object"
       ],
       "multiples": [
         "yud"
@@ -665,20 +762,26 @@
     },
     "swords02": {
       "name": "Two of Swords",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "celestial body",
         "person",
         "water",
         "clearly gendered woman",
-        "seated subject"
+        "seated subject",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "swords03": {
       "name": "Three of Swords",
       "descriptors": [
-        "negative"
+        "ominous",
+        "symmetrical"
       ],
       "contents": [
         "water"
@@ -701,12 +804,14 @@
         "person",
         "water",
         "clearly gendered man",
-        "cloud"
+        "cloud",
+        "held object"
       ],
       "multiples": [
         "person",
         "clearly gendered man",
-        "cloud"
+        "cloud",
+        "held object"
       ]
     },
     "swords06": {
@@ -717,7 +822,8 @@
         "water",
         "clearly gendered man",
         "clearly gendered woman",
-        "seated subject"
+        "seated subject",
+        "held object"
       ],
       "multiples": [
         "person",
@@ -730,9 +836,12 @@
       "contents": [
         "stage",
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "swords08": {
       "name": "Eight of Swords",
@@ -748,8 +857,8 @@
       "name": "Nine of Swords",
       "descriptors": [
         "indoors",
-        "dark",
-        "negative"
+        "dark-colored",
+        "ominous"
       ],
       "contents": [
         "person",
@@ -760,8 +869,8 @@
     "swords10": {
       "name": "Ten of Swords",
       "descriptors": [
-        "dark",
-        "negative"
+        "dark-colored",
+        "ominous"
       ],
       "contents": [
         "person",
@@ -776,10 +885,13 @@
       "contents": [
         "person",
         "clearly gendered man",
-        "cloud"
+        "cloud",
+        "bird",
+        "held object"
       ],
       "multiples": [
-        "cloud"
+        "cloud",
+        "bird"
       ]
     },
     "swords12": {
@@ -792,7 +904,8 @@
         "clearly gendered man",
         "seated subject",
         "armored subject",
-        "cloud"
+        "cloud",
+        "held object"
       ],
       "multiples": [
         "cloud"
@@ -806,7 +919,9 @@
         "clearly gendered woman",
         "seated subject",
         "crowned subject",
-        "cloud"
+        "cloud",
+        "bird",
+        "held object"
       ],
       "multiples": [
         "cloud"
@@ -820,17 +935,21 @@
         "clearly gendered man",
         "seated subject",
         "crowned subject",
-        "cloud"
+        "cloud",
+        "bird",
+        "held object"
       ],
       "multiples": [
-        "cloud"
+        "cloud",
+        "bird"
       ]
     },
     "pents01": {
       "name": "Ace of Pentacles",
       "descriptors": [],
       "contents": [
-        "cloud"
+        "cloud",
+        "held object"
       ],
       "multiples": []
     },
@@ -842,48 +961,58 @@
         "stage",
         "person",
         "water",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "pents03": {
       "name": "Three of Pentacles",
       "descriptors": [],
       "contents": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ]
     },
     "pents04": {
       "name": "Four of Pentacles",
-      "descriptors": [],
+      "descriptors": [
+        "symmetrical"
+      ],
       "contents": [
         "stage",
         "person",
         "city",
         "clearly gendered man",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
       "multiples": []
     },
     "pents05": {
       "name": "Five of Pentacles",
       "descriptors": [
-        "dark"
+        "dark-colored"
       ],
       "contents": [
         "person",
         "snow",
         "clearly gendered man",
-        "clearly gendered woman"
+        "clearly gendered woman",
+        "held object"
       ],
       "multiples": [
-        "person"
+        "person",
+        "held object"
       ]
     },
     "pents06": {
@@ -893,12 +1022,14 @@
         "stage",
         "person",
         "clearly gendered man",
-        "seated subject"
+        "seated subject",
+        "held object"
       ],
       "multiples": [
         "person",
         "clearly gendered man",
-        "seated subject"
+        "seated subject",
+        "held object"
       ]
     },
     "pents07": {
@@ -906,7 +1037,8 @@
       "descriptors": [],
       "contents": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
@@ -918,9 +1050,12 @@
         "person",
         "city",
         "clearly gendered man",
-        "seated subject"
+        "seated subject",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     },
     "pents09": {
       "name": "Nine of Pentacles",
@@ -928,7 +1063,9 @@
       "contents": [
         "animal",
         "person",
-        "clearly gendered woman"
+        "clearly gendered woman",
+        "bird",
+        "held object"
       ],
       "multiples": []
     },
@@ -956,7 +1093,8 @@
       "descriptors": [],
       "contents": [
         "person",
-        "clearly gendered man"
+        "clearly gendered man",
+        "held object"
       ],
       "multiples": []
     },
@@ -969,7 +1107,8 @@
         "person",
         "clearly gendered man",
         "seated subject",
-        "armored subject"
+        "armored subject",
+        "held object"
       ],
       "multiples": []
     },
@@ -981,7 +1120,8 @@
         "clearly gendered woman",
         "seated subject",
         "crowned subject",
-        "animal"
+        "animal",
+        "held object"
       ],
       "multiples": []
     },
@@ -993,9 +1133,12 @@
         "city",
         "clearly gendered man",
         "seated subject",
-        "crowned subject"
+        "crowned subject",
+        "held object"
       ],
-      "multiples": []
+      "multiples": [
+        "held object"
+      ]
     }
   }
 }

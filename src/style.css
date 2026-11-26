@@ -150,8 +150,10 @@ input {
   cursor: pointer;
 }
 
-.chip:hover {
-  border-color: var(--kind);
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--kind);
+  }
 }
 
 .chip[aria-pressed="true"] {
@@ -181,15 +183,16 @@ input {
   gap: 0.5rem;
 }
 
+/* Right-hand group stays right-justified even when it wraps onto its own line on a narrow screen. */
+.topbar #actions {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
 .header-actions .button {
   font-size: 0.85rem;
 }
 
-@media (max-width: 760px) {
-  .topbar {
-    justify-content: center;
-  }
-}
 
 /* "Showing x of y cards": centered on its own line, last row of the sticky toolbar */
 .status {
@@ -215,11 +218,18 @@ input {
   cursor: pointer;
 }
 
-.toolbar-toggle:hover,
 .toolbar-toggle:focus-visible {
   border-color: var(--accent);
   background: #ffffff1a;
   color: var(--accent);
+}
+
+@media (hover: hover) {
+  .toolbar-toggle:hover {
+    border-color: var(--accent);
+    background: #ffffff1a;
+    color: var(--accent);
+  }
 }
 
 .toolbar-active {
@@ -311,14 +321,20 @@ h3 .count {
   cursor: pointer;
 }
 
-.button:hover:not(:disabled),
 .button--primary {
   background: var(--btn);
   color: #1a1426;
 }
 
-.button--primary:hover:not(:disabled) {
-  filter: brightness(1.1);
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background: var(--btn);
+    color: #1a1426;
+  }
+
+  .button--primary:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
 }
 
 .button--danger {
@@ -418,10 +434,15 @@ h3 .count {
   cursor: pointer;
 }
 
-.context-menu button:hover,
 .context-menu button:focus-visible {
   background: #ffffff1a;
   outline: none;
+}
+
+@media (hover: hover) {
+  .context-menu button:hover {
+    background: #ffffff1a;
+  }
 }
 
 .context-menu .menu-heading {
@@ -521,8 +542,10 @@ h3 .count {
   filter: grayscale(0.7);
 }
 
-.card--dimmed:hover {
-  opacity: 0.6;
+@media (hover: hover) {
+  .card--dimmed:hover {
+    opacity: 0.6;
+  }
 }
 
 .card {
@@ -619,9 +642,11 @@ h3 .count {
   opacity: 0.7;
 }
 
-.tag-count:hover {
-  opacity: 1;
-  background: #ffffff26;
+@media (hover: hover) {
+  .tag-count:hover {
+    opacity: 1;
+    background: #ffffff26;
+  }
 }
 
 .tag-remove {
@@ -636,9 +661,11 @@ h3 .count {
   opacity: 0.7;
 }
 
-.tag-remove:hover {
-  opacity: 1;
-  background: #ffffff26;
+@media (hover: hover) {
+  .tag-remove:hover {
+    opacity: 1;
+    background: #ffffff26;
+  }
 }
 
 .tag-add,
@@ -667,10 +694,16 @@ h3 .count {
   cursor: pointer;
 }
 
-.tag-add:hover,
 .tag-add:focus-visible {
   border-color: var(--kind);
   color: var(--kind);
+}
+
+@media (hover: hover) {
+  .tag-add:hover {
+    border-color: var(--kind);
+    color: var(--kind);
+  }
 }
 
 .tag-input {
@@ -730,10 +763,16 @@ h3 .count {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.game-card--back:hover,
 .game-card--back:focus-visible {
   transform: perspective(700px) rotateY(-14deg) rotateX(4deg) scale(1.04);
   box-shadow: 14px 14px 30px #000b;
+}
+
+@media (hover: hover) {
+  .game-card--back:hover {
+    transform: perspective(700px) rotateY(-14deg) rotateX(4deg) scale(1.04);
+    box-shadow: 14px 14px 30px #000b;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -844,9 +883,14 @@ h3 .count {
   color: var(--text);
 }
 
-.picker:hover,
 .picker:focus-visible {
   border-color: var(--kind, var(--accent));
+}
+
+@media (hover: hover) {
+  .picker:hover {
+    border-color: var(--kind, var(--accent));
+  }
 }
 
 .picker-caret {
@@ -891,6 +935,7 @@ h3 .count {
 
 .game-history li {
   display: flex;
+  align-items: center; /* keep the Yes/No pill vertically centered when the question wraps */
   justify-content: space-between;
   gap: 1rem;
   padding: 0.35rem 0.4rem;
