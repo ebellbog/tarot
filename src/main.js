@@ -1,5 +1,7 @@
+import { faAngleDown } from "@fortawesome/free-solid-svg-icons/faAngleDown";
 import { CARDS, imageUrl } from "./cards.js";
 import { el } from "./dom.js";
+import { faIcon } from "./icons.js";
 import { createGame, playableCards } from "./game.js";
 import { openContextMenu, openDialog } from "./overlays.js";
 import * as store from "./store.js";
@@ -467,16 +469,41 @@ function matches(card) {
   return filter.mode === "all" ? picks.every(Boolean) : picks.some(Boolean);
 }
 
+const overflowSyncs = []; // one per chip list; re-run whenever the chips are rebuilt
+
+function syncOverflowCaret(chips, caret) {
+  caret.hidden = chips.scrollHeight <= chips.clientHeight + 1;
+  // At the bottom it only turns invisible, so the toolbar doesn't change height mid-scroll.
+  caret.classList.toggle("is-at-end", chips.scrollTop + chips.clientHeight >= chips.scrollHeight - 1);
+}
+
 function buildToolbar() {
   const groups = {};
   const groupEls = KINDS.map((kind) => {
     const chips = el("div", { class: "chips" });
     groups[kind] = chips;
+    // Shown under a chip list that overflows, while there are more chips further down.
+    const more = el(
+      "button",
+      {
+        type: "button",
+        class: "chips-more",
+        title: "Scroll to more tags",
+        "aria-label": "Scroll to more tags",
+        hidden: true,
+        onClick: () => chips.scrollBy({ top: chips.clientHeight, behavior: "smooth" }),
+      },
+      faIcon(faAngleDown),
+    );
+    const sync = () => syncOverflowCaret(chips, more);
+    chips.addEventListener("scroll", sync, { passive: true });
+    new ResizeObserver(sync).observe(chips); // rewrapping on resize, or the filters being shown again
+    overflowSyncs.push(sync);
     return el(
       "div",
       { class: `chip-group kind-${kind}`, title: KIND_UI[kind].filterHint },
       el("span", { class: "chip-group-label" }, KIND_UI[kind].filterLabel),
-      chips,
+      el("div", { class: "chips-wrap" }, chips, more),
     );
   });
 
@@ -703,6 +730,7 @@ function updateFilterUI() {
     minorGroup.countEl.textContent = n === MINOR_COUNT ? String(n) : `${n} / ${MINOR_COUNT}`;
   }
   toolbar.status.textContent = `Showing ${shown} of ${CARDS.length} cards`;
+  overflowSyncs.forEach((sync) => sync());
 }
 
 // ---------- init ----------

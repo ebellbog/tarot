@@ -1,0 +1,1176 @@
+// ---------- palette & type ----------
+
+@gold: #d9b45a; // the app accent, and descriptor ("is...") tags
+@teal: #5fc4b4; // content ("has...") tags, and "yes"
+@red: #e5706b; // danger, duplicates, and "no"
+@ink: #1a1426; // text on a filled gold/teal/light background
+@border: #ffffff2e;
+@border-dashed: #ffffff40;
+@divider: #ffffff1f;
+@highlight: #ffffff1a; // hover/focus background
+@highlight-strong: #ffffff26; // pressed segments, and buttons inside tags
+@bar-bg: #14101fee; // translucent background of the sticky bars
+@serif: Georgia, "Times New Roman", serif;
+
+// ---------- mixins ----------
+
+.serif-heading() {
+  font-family: @serif;
+  font-weight: normal;
+}
+
+// Small spaced-out capitals, for headings inside menus and cards.
+.eyebrow() {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// Keyboard focus always gets the style; hover only on devices that can hover, so it doesn't stick after a tap.
+.focus-or-hover(@styles) {
+  &:focus-visible {
+    @styles();
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      @styles();
+    }
+  }
+}
+
+// ---------- base ----------
+
+:root {
+  --bg: #14101f;
+  --surface: #1e1830;
+  --text: #ece6f5;
+  --muted: #9d93b5;
+  --accent: @gold;
+  --kind: var(--accent); // overridden per tag kind below
+  color-scheme: dark;
+}
+
+// Tag kinds: descriptors ("is...") are gold, contents ("has...") are teal.
+.kind-descriptor {
+  --kind: @gold;
+}
+
+.kind-content {
+  --kind: @teal;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.4;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h2 {
+  .serif-heading();
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid @highlight;
+}
+
+// Suit / rank headings inside the "Minor Arcana" section
+h3 {
+  .serif-heading();
+  margin: 2rem 0 0.8rem;
+  font-size: 1.15rem;
+
+  .count {
+    font-size: 0.8em;
+    color: var(--muted);
+    margin-left: 0.4em;
+  }
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.count {
+  font-size: 0.75em;
+  color: var(--muted);
+  margin-left: 0.4em;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.fa-icon {
+  display: block;
+  height: 1em;
+  fill: currentColor;
+}
+
+// ---------- buttons & controls ----------
+
+.button {
+  --btn: var(--accent);
+  padding: 0.25rem 0.8rem;
+  border: 1px solid var(--btn);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--btn);
+  cursor: pointer;
+
+  &--primary {
+    background: var(--btn);
+    color: @ink;
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: var(--btn);
+      color: @ink;
+    }
+
+    &--primary:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+  }
+
+  &--danger {
+    --btn: @red;
+  }
+
+  &--content {
+    --btn: @teal; // the same green as the "Has…" tags (.kind-content)
+  }
+
+  &--plain {
+    --btn: var(--text);
+  }
+
+  &--ghost {
+    --btn: #ffffff59;
+    color: var(--text);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+// Segmented control ("Match: All | Any", "Layout")
+.seg {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid @border;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+
+  &:first-of-type {
+    border-radius: 6px 0 0 6px;
+  }
+
+  &:last-of-type {
+    border-radius: 0 6px 6px 0;
+  }
+
+  & + & {
+    margin-left: -0.4rem; // cancel the flex gap so the buttons touch
+  }
+
+  &[aria-pressed="true"] {
+    background: @highlight-strong;
+    color: var(--text);
+  }
+}
+
+.mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &.is-inactive {
+    opacity: 0.5;
+  }
+}
+
+// Layout toggle: sits right under a section heading's divider. Shares its element with .mode, so must follow it.
+.layout-toggle {
+  display: flex;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+// Checkbox with a label
+.check-toggle,
+.game-splits-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+
+  input {
+    accent-color: @teal;
+  }
+}
+
+// ---------- header ----------
+
+// Action buttons stay pinned to the top of the screen; the filter toolbar sticks just below (--topbar-h).
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
+  background: @bar-bg;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #ffffff33;
+
+  // Right-hand group stays right-justified even when it wraps onto its own line on a narrow screen.
+  #actions {
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .button {
+    font-size: 0.85rem;
+
+    @media (max-width: 600px) {
+      padding-inline: 0.5em;
+    }
+  }
+}
+
+.site-header {
+  text-align: center;
+  padding: 1.5rem 1rem 1rem;
+
+  h1 {
+    .serif-heading();
+    margin: 0;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+// ---------- filter toolbar ----------
+
+.toolbar {
+  position: sticky;
+  top: calc(var(--topbar-h, 0px) - 1px); // overlaps the bar's bottom border, so the two draw as one line
+  z-index: 10;
+  background: @bar-bg;
+  backdrop-filter: blur(6px);
+  border-top: 1px solid #ffffff33; // separates the filters from the title above (and the pinned bar when stuck)
+  border-bottom: 1px solid @highlight;
+
+  // Collapsed: only the "Showing x of y cards" line and the Show filters link remain.
+  &.is-collapsed {
+    .chip-group,
+    .toolbar-row {
+      display: none;
+    }
+
+    .toolbar-inner {
+      padding-top: 1em;
+    }
+  }
+}
+
+.toolbar-inner {
+  position: relative; // anchors the disclosure caret
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.75rem 1rem 0.75rem 3.25rem; // left room for the caret, so it never overlaps the filters
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+// Disclosure caret in the filter section's left gutter
+.toolbar-toggle {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.6rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid @border-dashed;
+  border-radius: 6px;
+  background: #ffffff0d;
+  color: var(--text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+
+  .focus-or-hover({
+    border-color: var(--accent);
+    background: @highlight;
+    color: var(--accent);
+  });
+}
+
+.toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.4em 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+
+  // the "Only cards without unique tags" checkbox sits inline
+  .check-toggle {
+    margin-top: 0;
+  }
+}
+
+// "Showing x of y cards": centered on its own line, last row of the sticky toolbar
+.toolbar-foot {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.85rem;
+}
+
+.status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.toolbar-active {
+  color: var(--accent);
+}
+
+// ---------- filter chips ----------
+
+.chip-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.chip-group-label {
+  flex: none;
+  width: 2.2rem;
+  font-family: @serif;
+  font-style: italic;
+  color: var(--kind);
+}
+
+.chips-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 6rem;
+  overflow-y: auto;
+}
+
+// Caret under a chip list that has more chips to scroll to
+.chips-more {
+  align-self: center;
+  padding: 0 1.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--kind);
+  opacity: 0.75;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &.is-at-end {
+    visibility: hidden;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid @border;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--kind);
+    }
+  }
+
+  &[aria-pressed="true"] {
+    background: var(--kind);
+    border-color: var(--kind);
+    color: @ink;
+  }
+}
+
+.chip-count {
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+// ---------- dialog ----------
+
+.dialog {
+  width: min(28rem, 90vw);
+  padding: 1.25rem 1.4rem;
+  border: 1px solid @border;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+
+  &::backdrop {
+    background: #000a;
+  }
+
+  h3 {
+    .serif-heading();
+    margin: 0 0 0.6rem;
+    color: var(--accent);
+    overflow-wrap: anywhere;
+  }
+}
+
+.dialog-message {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+.dialog-input {
+  display: block;
+  width: 100%;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+// ---------- context menu ----------
+
+.context-menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 12rem;
+  padding: 0.25rem;
+  border: 1px solid @border;
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px #000a;
+  max-height: min(20rem, 60vh);
+  overflow-y: auto;
+
+  button {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0.4rem 0.7rem;
+    border: 0;
+    border-radius: 5px;
+    background: none;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    .focus-or-hover({
+      background: @highlight;
+    });
+
+    &:focus-visible {
+      outline: none;
+    }
+
+    // after the hover style, so that it wins
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: none;
+    }
+
+    & + .menu-heading {
+      margin-top: 0.25rem;
+      border-top: 1px solid @divider;
+    }
+  }
+
+  .menu-heading {
+    .eyebrow();
+    padding: 0.55rem 0.7rem 0.2rem;
+    color: var(--muted);
+  }
+
+  .hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .danger {
+    color: @red;
+  }
+
+  .accent {
+    color: var(--accent);
+  }
+
+  .separator {
+    margin-top: 0.25rem;
+    border-top: 1px solid @divider;
+    border-radius: 0 0 5px 5px;
+    padding-top: 0.55rem;
+  }
+}
+
+// ---------- card layouts ----------
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.section-note {
+  max-width: 60rem;
+  margin: -0.4rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+// Pollack layout: the Fool alone on top, then 3 rows x 7 columns sharing one column definition.
+// On narrow screens the grid scrolls sideways instead of squeezing the cards.
+.threes {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.threes-inner {
+  min-width: calc(7 * 150px + 6 * 1rem);
+}
+
+.threes-fool,
+.threes-rows {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.threes-fool {
+  margin-bottom: 1rem;
+
+  > .card {
+    grid-column: 4; // centered above the middle column
+  }
+}
+
+// ---------- cards ----------
+
+.card {
+  margin: 0;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 330 / 570;
+    background: #2a2340;
+  }
+
+  figcaption {
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  &--dimmed {
+    opacity: 0.22;
+    filter: grayscale(0.7);
+
+    @media (hover: hover) {
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  &--broken img {
+    visibility: hidden;
+  }
+}
+
+// ---------- tags on cards ----------
+
+.card-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0 0.5rem 0.6rem;
+}
+
+// "Unique" / "Same tags as n other cards"
+.card-twins {
+  margin: 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid @divider;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+
+  &.is-duplicate {
+    color: @red;
+  }
+}
+
+.tag-group {
+  & + & {
+    padding-top: 0.55rem;
+    border-top: 1px solid @divider;
+  }
+}
+
+.tag-group-title {
+  .eyebrow();
+  margin: 0 0 0.35rem;
+  color: var(--kind);
+  opacity: 0.85;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.2rem 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--kind) 18%, transparent);
+  color: var(--kind);
+  font-size: 0.75rem;
+
+  &--multiple {
+    background: color-mix(in srgb, var(--kind) 32%, transparent);
+  }
+}
+
+// The two round buttons inside a tag
+.tag-count,
+.tag-remove {
+  height: 1.2rem;
+  border: 0;
+  background: none;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 1;
+      background: @highlight-strong;
+    }
+  }
+}
+
+.tag-count {
+  min-width: 1.2rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  color: inherit;
+  font-size: 0.7rem;
+}
+
+.tag-remove {
+  width: 1.2rem;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.tag-add,
+.tag-input {
+  padding: 0.25rem 0.4rem;
+  border: 1px dashed @border-dashed;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+// The add control: a dashed circle, the same height as a tag chip (1.2rem button + 0.1rem padding each side).
+// The "+" is drawn with two gradient bars so it is exactly centered, whatever the font.
+.tag-add {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0;
+  color: var(--muted);
+  background:
+    linear-gradient(currentColor, currentColor) center / 0.6rem 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 0.6rem no-repeat;
+  cursor: pointer;
+
+  .focus-or-hover({
+    border-color: var(--kind);
+    color: var(--kind);
+  });
+}
+
+.tag-input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  border-style: solid;
+  border-color: var(--kind);
+  color: var(--text);
+}
+
+// ---------- footer ----------
+
+.site-footer {
+  text-align: center;
+  padding: 2rem 1rem 3rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+
+  a {
+    color: var(--accent);
+  }
+}
+
+// ---------- test mode: layout ----------
+
+.game {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+  text-align: center;
+}
+
+.game-stats {
+  margin: 1rem 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+
+  .link-button {
+    margin-left: 0.9rem;
+  }
+}
+
+.game-prompt {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.game-divider {
+  margin: 1.75rem 0;
+  border: 0;
+  border-top: 1px solid @divider;
+}
+
+.game-win h2 {
+  margin: 1.25rem 0 0.5rem;
+  color: var(--accent);
+}
+
+// ---------- test mode: secret card ----------
+
+.game-card {
+  display: block;
+  width: min(14rem, 60vw);
+  aspect-ratio: 330 / 570;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px #000a;
+
+  // Card back: the deck's own art. It tilts toward you on hover, as if about to flip.
+  &--back {
+    aspect-ratio: 850 / 1451; // the scan's proportions, so no edge is cropped
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    overflow: hidden;
+    cursor: pointer;
+    transform-origin: 50% 60%;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+
+    .focus-or-hover({
+      transform: perspective(700px) rotateY(-14deg) rotateX(4deg) scale(1.04);
+      box-shadow: 14px 14px 30px #000b;
+    });
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+
+    // If the image fails to load: a gold-framed lattice with a center jewel, drawn in CSS.
+    &.is-fallback {
+      border: 2px solid var(--accent);
+      background-color: #2a1f4d;
+      background-image:
+        radial-gradient(circle, var(--accent) 0 5%, #2a1f4d 5.5% 9%, var(--accent) 9.5% 10.5%, transparent 11%),
+        repeating-linear-gradient(45deg, #ffffff12 0 6px, transparent 6px 12px),
+        repeating-linear-gradient(-45deg, #ffffff12 0 6px, transparent 6px 12px);
+
+      .game-card-art {
+        display: none;
+      }
+    }
+  }
+}
+
+.game-card-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  transform: scale(1.026) rotate(1deg); // trims the thin strip of scanner background around the card
+  pointer-events: none; // clicks go to the button
+}
+
+// ---------- test mode: asking & guessing ----------
+
+.game-ask-buttons,
+.game-form,
+.game-guess,
+.game-wrong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+// Two ask buttons side by side, with "Ask best question" on its own line below them.
+.game-ask-buttons {
+  flex-direction: column;
+}
+
+.game-ask-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.game-form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.4rem;
+}
+
+// Dropdown button, styled to match the add-tag menus it opens (see .context-menu)
+.picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px dashed @border-dashed;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+
+  &.has-value {
+    border-style: solid;
+    border-color: var(--kind, var(--accent));
+    color: var(--text);
+  }
+
+  .focus-or-hover({
+    border-color: var(--kind, var(--accent));
+  });
+}
+
+.picker-caret {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.game-wrong {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.game-wrong-card {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: fade(@red, 13.3%);
+  color: @red;
+  text-decoration: line-through;
+}
+
+// ---------- test mode: question history ----------
+
+.game-history {
+  margin: 1.5rem 0 0;
+  text-align: left;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center; // keep the Yes/No pill vertically centered when the question wraps
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0.4rem;
+    border-bottom: 1px solid #ffffff14;
+    border-radius: 4px;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    // Asking the same question twice flashes the existing row instead of adding one.
+    &.is-repeat {
+      animation: repeat-flash 1.2s ease-out;
+    }
+  }
+}
+
+@keyframes repeat-flash {
+  from {
+    background: fade(@gold, 25%);
+  }
+}
+
+.game-history h3,
+.game-guess-area h3 {
+  .serif-heading();
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.game-pill {
+  flex: none;
+  padding: 0.1rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+
+  &.is-yes {
+    background: fade(@teal, 20%);
+    color: @teal;
+  }
+
+  &.is-no {
+    background: fade(@red, 20%);
+    color: @red;
+  }
+}
+
+// ---------- visualize data (decision tree) ----------
+
+.dialog--tree {
+  width: min(1200px, 95vw);
+  max-width: none;
+  height: 90vh;
+  max-height: none;
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.tree-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.tree-summary,
+.tree-legend {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.tree-summary .is-group {
+  color: @red;
+}
+
+.tree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+
+  // a short line sample in front of each entry
+  span::before {
+    content: "";
+    display: inline-block;
+    width: 1.4rem;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+    border-top: 2px solid;
+  }
+
+  .legend-yes::before {
+    border-color: @teal;
+  }
+
+  .legend-no::before {
+    border-top-style: dashed;
+    border-color: var(--muted);
+  }
+}
+
+.legend-group {
+  color: @red;
+}
+
+.tree-scroll {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0.8rem;
+  overflow: auto;
+  border-top: 1px solid @divider;
+}
+
+.tree {
+  display: block;
+  font-size: 12px;
+
+  text {
+    fill: var(--text);
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+}
+
+.tree-edge {
+  fill: none;
+  stroke-width: 1.5;
+
+  &.is-yes {
+    stroke: @teal;
+  }
+
+  &.is-no {
+    stroke: var(--muted);
+    stroke-dasharray: 4 3;
+  }
+}
+
+.tree-question {
+  circle,
+  text {
+    fill: var(--accent);
+  }
+}
+
+.tree-leaf {
+  circle {
+    fill: var(--text);
+  }
+
+  &.is-group {
+    circle {
+      fill: @red;
+      stroke: @red;
+    }
+
+    text {
+      fill: @red;
+    }
+  }
+}
+
+.tree-bracket {
+  fill: none;
+  stroke: @red;
+  stroke-width: 1.5;
+}
