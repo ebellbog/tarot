@@ -63,6 +63,22 @@ export function bestQuestion(cards) {
   return best;
 }
 
+/**
+ * How "Ask best question" would have found `secret` among `pool`: the number of questions it asks before no
+ * question can narrow things further, and how many cards are then left to guess between (more than 1 only for
+ * cards with identical tags).
+ */
+export function bestPath(pool, secret) {
+  let cards = pool;
+  let questions = 0;
+  for (let best = bestQuestion(cards); best; best = bestQuestion(cards)) {
+    const answer = answerQuestion(secret, best.q);
+    cards = cards.filter((c) => answerQuestion(c, best.q) === answer);
+    questions++;
+  }
+  return { questions, candidates: cards.length };
+}
+
 // ---------- identical tag sets ----------
 
 /** A key that is equal for two cards exactly when no question can tell them apart. */

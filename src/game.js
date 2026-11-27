@@ -10,7 +10,7 @@ import { CARDS, cardBackUrl, imageUrl } from "./cards.js";
 import { el } from "./dom.js";
 import { openContextMenu, openDialog } from "./overlays.js";
 import * as store from "./store.js";
-import { AMOUNTS, answerQuestion, bestQuestion, questionText, remainingCards, split } from "./questions.js";
+import { AMOUNTS, answerQuestion, bestPath, bestQuestion, questionText, remainingCards, split } from "./questions.js";
 import { countForms, plural } from "./words.js";
 
 // "Show splits" checkbox: annotate question options with how they divide the remaining cards (yes / no).
@@ -225,6 +225,24 @@ export function createGame() {
 
   // ---------- rendering ----------
 
+  /**
+   * After a win: how the player compares with the best strategy, counting each question or guess as one move.
+   * With identical cards left, which one to guess is luck, so anywhere from a first-try to a last-try guess
+   * counts as matching.
+   */
+  function bestComparison() {
+    const { questions, candidates } = bestPath(g.pool, g.secret);
+    const matched = g.log.length + g.guesses.length <= questions + candidates; // or beat it
+    const guesses = candidates === 1 ? "1 guess" : `1–${candidates} guesses (${candidates} cards share these tags)`;
+    return el(
+      "p",
+      { class: matched ? "game-best is-matched" : "game-best" },
+      matched
+        ? "Congrats, this was the lowest possible number of questions and guesses!"
+        : `The best strategy could have identified this card in ${plural(questions, "question")} and ${guesses}.`,
+    );
+  }
+
   /** The face-down card: the original deck back, with the CSS pattern as a fallback if the image can't load. */
   function cardBack() {
     const img = el("img", {
@@ -311,7 +329,13 @@ export function createGame() {
 
     const summary = `${plural(g.log.length, "question")} and ${plural(g.guesses.length, "guess")}`;
     const asking = g.solved
-      ? el("div", { class: "game-win", role: "status" }, el("h2", {}, "You got it!"), el("p", {}, `It was ${g.secret.name}, found with ${summary}.`))
+      ? el(
+          "div",
+          { class: "game-win", role: "status" },
+          el("h2", {}, "You got it!"),
+          el("p", {}, `It was ${g.secret.name}, found with ${summary}.`),
+          bestComparison(),
+        )
       : g.revealed
         ? el("div", { class: "game-win", role: "status" }, el("h2", {}, g.secret.name), el("p", {}, `Revealed after ${summary}.`))
         : el(

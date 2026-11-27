@@ -4,6 +4,7 @@ import { el } from "./dom.js";
 import { faIcon } from "./icons.js";
 import { createGame, playableCards } from "./game.js";
 import { openContextMenu, openDialog } from "./overlays.js";
+import { openPopularityDialog } from "./popularity.js";
 import * as store from "./store.js";
 import { countLabels, plural } from "./words.js";
 import { identicalTagMap } from "./questions.js";
@@ -160,6 +161,48 @@ const sectionRefs = []; // current layout's card sections: { section, countEl, c
 let minorGroup = null; // { countEl, sections }: the "Minor Arcana" heading's running count
 let toolbar; // refs to toolbar elements
 
+// ---------- scroll carets ----------
+// A caret under a height-limited tag list, shown while there are more tags further down.
+
+const scrollCarets = new WeakMap(); // list element -> its caret button
+
+function syncScrollCarets(lists) {
+  // Measure every list before changing any caret, to avoid a re-layout per list.
+  const states = lists.map((list) => ({
+    caret: scrollCarets.get(list),
+    overflows: list.scrollHeight > list.clientHeight + 1,
+    atEnd: list.scrollTop + list.clientHeight >= list.scrollHeight - 1,
+  }));
+  for (const { caret, overflows, atEnd } of states) {
+    caret.hidden = !overflows;
+    // At the bottom it only turns invisible, so nothing changes height mid-scroll.
+    caret.classList.toggle("is-at-end", atEnd);
+  }
+}
+
+// Catches lists changing size: first appearance, rewrapping on resize, or being shown again.
+const listResizes = new ResizeObserver((entries) => syncScrollCarets(entries.map((e) => e.target)));
+
+/** The caret for `list`; place it right after the list. */
+function scrollCaret(list) {
+  const caret = el(
+    "button",
+    {
+      type: "button",
+      class: "scroll-more",
+      title: "Scroll to more tags",
+      "aria-label": "Scroll to more tags",
+      hidden: true,
+      onClick: () => list.scrollBy({ top: list.clientHeight, behavior: "smooth" }),
+    },
+    faIcon(faAngleDown),
+  );
+  scrollCarets.set(list, caret);
+  list.addEventListener("scroll", () => syncScrollCarets([list]), { passive: true });
+  listResizes.observe(list);
+  return caret;
+}
+
 // ---------- cards ----------
 
 function buildCard(card) {
@@ -218,14 +261,23 @@ function renderCardTags(ref) {
       );
     });
     ref.addEls[kind] = buildAddButton(ref, kind);
+    const list = el("div", { class: "tag-list" }, ...chips, ref.addEls[kind]);
     return el(
       "div",
       { class: `tag-group kind-${kind}` },
       el("h4", { class: "tag-group-title" }, KIND_UI[kind].groupTitle),
-      el("div", { class: "tag-list" }, ...chips, ref.addEls[kind]),
+      list,
+      scrollCaret(list),
     );
   });
+  // The lists are rebuilt from scratch, so carry their scroll positions over.
+  const oldLists = [...ref.tagsEl.querySelectorAll(".tag-list")];
+  const scrolls = oldLists.map((list) => list.scrollTop);
+  oldLists.forEach((list) => listResizes.unobserve(list));
   ref.tagsEl.replaceChildren(...[...groups, twinsFooter(card)].filter(Boolean));
+  ref.tagsEl.querySelectorAll(".tag-list").forEach((list, i) => {
+    if (scrolls[i]) list.scrollTop = scrolls[i];
+  });
 }
 
 /** "Unique" or "Same tags as n other cards" (untagged cards aren't in the game, so they get no footer). */
@@ -444,12 +496,28 @@ async function importTagsFromFile(file, { firstRun = false } = {}) {
 }
 
 async function clearTagsFlow() {
+  const tagged = taggedCardCount();
   const result = await openDialog({
-    title: "Clear all tags?",
-    message: `This removes every tag from ${plural(taggedCardCount(), "tagged card")}. This can't be undone, so export first if you want a backup.`,
-    actions: [{ label: "Clear all tags", value: "clear", kind: "danger" }],
+    title: "Clear or reset tags?",
+    message:
+      `Reset to default replaces your tags with the latest default set.\n` +
+      `Clear all tags removes every tag.\n\n` +
+      `Either way, your current tags (${plural(tagged, "tagged card")}) are discarded. This can't be undone, so export first if you want a backup.`,
+    actions: [
+      { label: "Reset to default", value: "reset" },
+      { label: "Clear all tags", value: "clear", kind: "danger" },
+    ],
   });
-  if (result) store.clearAllTags();
+  if (result?.value === "clear") store.clearAllTags();
+  if (result?.value !== "reset") return;
+
+  const defaults = await loadDefaultTags();
+  if (defaults) return store.importTags(defaults.tags, "replace");
+  await openDialog({
+    title: "Couldn't load the default tags",
+    message: "Your tags haven't been changed. Check your connection and try again.",
+    cancelLabel: "OK",
+  });
 }
 
 // ---------- filters ----------
@@ -469,41 +537,16 @@ function matches(card) {
   return filter.mode === "all" ? picks.every(Boolean) : picks.some(Boolean);
 }
 
-const overflowSyncs = []; // one per chip list; re-run whenever the chips are rebuilt
-
-function syncOverflowCaret(chips, caret) {
-  caret.hidden = chips.scrollHeight <= chips.clientHeight + 1;
-  // At the bottom it only turns invisible, so the toolbar doesn't change height mid-scroll.
-  caret.classList.toggle("is-at-end", chips.scrollTop + chips.clientHeight >= chips.scrollHeight - 1);
-}
-
 function buildToolbar() {
   const groups = {};
   const groupEls = KINDS.map((kind) => {
     const chips = el("div", { class: "chips" });
     groups[kind] = chips;
-    // Shown under a chip list that overflows, while there are more chips further down.
-    const more = el(
-      "button",
-      {
-        type: "button",
-        class: "chips-more",
-        title: "Scroll to more tags",
-        "aria-label": "Scroll to more tags",
-        hidden: true,
-        onClick: () => chips.scrollBy({ top: chips.clientHeight, behavior: "smooth" }),
-      },
-      faIcon(faAngleDown),
-    );
-    const sync = () => syncOverflowCaret(chips, more);
-    chips.addEventListener("scroll", sync, { passive: true });
-    new ResizeObserver(sync).observe(chips); // rewrapping on resize, or the filters being shown again
-    overflowSyncs.push(sync);
     return el(
       "div",
       { class: `chip-group kind-${kind}`, title: KIND_UI[kind].filterHint },
       el("span", { class: "chip-group-label" }, KIND_UI[kind].filterLabel),
-      el("div", { class: "chips-wrap" }, chips, more),
+      el("div", { class: "chips-wrap" }, chips, scrollCaret(chips)),
     );
   });
 
@@ -535,13 +578,28 @@ function buildToolbar() {
         openContextMenu(rect.right, rect.bottom + 4, [
           { label: "Export tags…", disabled: !hasTags, onSelect: exportTags },
           { label: "Import tags…", onSelect: () => fileInput.click() },
-          { label: "Clear tags…", danger: true, separator: true, disabled: !hasTags, onSelect: clearTagsFlow },
+          { label: "Clear or reset tags…", danger: true, separator: true, onSelect: clearTagsFlow },
         ], { alignRight: true }); // it sits at the page's right edge
       },
     },
     "Manage tags ▾",
   );
-  const visualizeBtn = el("button", { type: "button", class: "button button--plain", onClick: openTreeDialog }, "Visualize data");
+  const visualizeBtn = el(
+    "button",
+    {
+      type: "button",
+      class: "button button--plain",
+      "aria-haspopup": "menu",
+      onClick: () => {
+        const rect = visualizeBtn.getBoundingClientRect();
+        openContextMenu(rect.right, rect.bottom + 4, [
+          { label: "Classification tree", onSelect: openTreeDialog },
+          { label: "Tag popularity", onSelect: openPopularityDialog },
+        ], { alignRight: true });
+      },
+    },
+    "Visualize data ▾",
+  );
 
   const duplicatesBox = el("input", {
     type: "checkbox",
@@ -730,7 +788,7 @@ function updateFilterUI() {
     minorGroup.countEl.textContent = n === MINOR_COUNT ? String(n) : `${n} / ${MINOR_COUNT}`;
   }
   toolbar.status.textContent = `Showing ${shown} of ${CARDS.length} cards`;
-  overflowSyncs.forEach((sync) => sync());
+  syncScrollCarets(Object.values(toolbar.groups)); // new chips don't resize a list that's already full height
 }
 
 // ---------- init ----------

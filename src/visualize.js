@@ -1,9 +1,10 @@
-// "Visualize data": the decision tree "Ask best question" would follow, for every card the game can pick.
+// "Classification tree": the decision tree "Ask best question" would follow, for every card the game can pick.
 // Drawn left to right as SVG: each question splits into a "yes" branch (solid) and a "no" branch (dashed).
 // Leaves are card names; a red leaf holds several cards whose tags are identical, so no question splits them.
 
 import { el } from "./dom.js";
 import { playableCards } from "./game.js";
+import { openDataDialog } from "./overlays.js";
 import { buildTree } from "./questions.js";
 import { countLabels, plural } from "./words.js";
 
@@ -157,16 +158,5 @@ export function openTreeDialog() {
     el("span", { class: "legend-no" }, "no"),
     el("span", { class: "legend-group" }, "cards no question can tell apart"),
   );
-  const close = el("button", { type: "button", class: "button button--ghost", onClick: () => dialog.close() }, "Close");
-  const dialog = el(
-    "dialog",
-    { class: "dialog dialog--tree", "aria-label": "Visualize data" },
-    el("div", { class: "tree-header" }, el("h3", {}, "How your tags narrow down the cards"), close),
-    summary,
-    legend,
-    el("div", { class: "tree-scroll" }, drawTree(tree)),
-  );
-  dialog.addEventListener("close", () => dialog.remove());
-  document.body.append(dialog);
-  dialog.showModal();
+  openDataDialog({ title: "How your tags narrow down the cards" }, summary, legend, el("div", { class: "tree-scroll" }, drawTree(tree)));
 }

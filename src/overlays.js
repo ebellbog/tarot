@@ -60,6 +60,20 @@ export function openDialog({ title, message = "", input = null, actions = [], ca
   });
 }
 
+/** A large, scrollable modal for data views: a title with a Close button, then `content`. */
+export function openDataDialog({ title, className = "" }, ...content) {
+  const close = el("button", { type: "button", class: "button button--ghost", onClick: () => dialog.close() }, "Close");
+  const dialog = el(
+    "dialog",
+    { class: `dialog dialog--data ${className}`, "aria-label": title },
+    el("div", { class: "data-header" }, el("h3", {}, title), close),
+    ...content,
+  );
+  dialog.addEventListener("close", () => dialog.remove());
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
 // ---------- context menu ----------
 
 let active = null; // { menu, opener, cleanup }

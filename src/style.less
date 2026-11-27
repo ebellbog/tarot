@@ -12,7 +12,15 @@
 @bar-bg: #14101fee; // translucent background of the sticky bars
 @serif: Georgia, "Times New Roman", serif;
 
+@tag-height: 1.4rem; // a 1.2rem button + 0.1rem padding each side
+@tag-gap: 0.3rem;
+
 // ---------- mixins ----------
+
+// Limits a list of tags to this many rows' height.
+.max-tag-rows(@rows) {
+  max-height: (@rows * @tag-height + (@rows - 1) * @tag-gap);
+}
 
 .serif-heading() {
   font-family: @serif;
@@ -37,6 +45,15 @@
     &:hover {
       @styles();
     }
+  }
+}
+
+// Slim scrollbar in the tag kind's colour, for the scrolling tag lists. Touch devices keep their own.
+.tinted-scrollbar() {
+  @media (hover: hover) {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--kind) 50%, transparent) transparent;
+    padding-right: 2px; // breathing room between the tags and the scrollbar
   }
 }
 
@@ -392,6 +409,27 @@ input {
   color: var(--accent);
 }
 
+// ---------- scroll caret ----------
+
+// Under a height-limited tag list (filter chips, or tags on a card) that has more to scroll to
+.scroll-more {
+  display: block;
+  align-self: center;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--kind);
+  opacity: 0.75;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &.is-at-end {
+    visibility: hidden;
+  }
+}
+
 // ---------- filter chips ----------
 
 .chip-group {
@@ -421,23 +459,7 @@ input {
   gap: 0.4rem;
   max-height: 6rem;
   overflow-y: auto;
-}
-
-// Caret under a chip list that has more chips to scroll to
-.chips-more {
-  align-self: center;
-  padding: 0 1.5rem;
-  border: 0;
-  background: transparent;
-  color: var(--kind);
-  opacity: 0.75;
-  font-size: 1.25rem;
-  line-height: 1;
-  cursor: pointer;
-
-  &.is-at-end {
-    visibility: hidden;
-  }
+  .tinted-scrollbar();
 }
 
 .chip {
@@ -715,7 +737,14 @@ input {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem;
+  gap: @tag-gap;
+  .max-tag-rows(6);
+  overflow-y: auto;
+  .tinted-scrollbar();
+
+  @media (max-width: 600px) {
+    .max-tag-rows(3);
+  }
 }
 
 .tag {
@@ -850,6 +879,17 @@ input {
 .game-win h2 {
   margin: 1.25rem 0 0.5rem;
   color: var(--accent);
+}
+
+// How the round compares with the best strategy
+.game-best {
+  margin-top: -0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+
+  &.is-matched {
+    color: @teal;
+  }
 }
 
 // ---------- test mode: secret card ----------
@@ -1045,9 +1085,9 @@ input {
   }
 }
 
-// ---------- visualize data (decision tree) ----------
+// ---------- visualize data: shared dialog & decision tree ----------
 
-.dialog--tree {
+.dialog--data {
   width: min(1200px, 95vw);
   max-width: none;
   height: 90vh;
@@ -1059,7 +1099,11 @@ input {
   }
 }
 
-.tree-header {
+.dialog--narrow {
+  width: min(44rem, 95vw);
+}
+
+.data-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1174,3 +1218,86 @@ input {
   stroke: @red;
   stroke-width: 1.5;
 }
+
+// ---------- visualize data: tag popularity ----------
+
+.dialog--data > .check-toggle {
+  align-self: flex-start;
+  margin-top: 0.6rem;
+}
+
+// Two columns that scroll separately: tags on the left, the selected tag's cards on the right
+.popularity {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 1rem;
+  margin-top: 0.8rem;
+  border-top: 1px solid @divider;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.popularity-tags,
+.popularity-cards {
+  overflow-y: auto;
+  padding-top: 0.5rem;
+  .tinted-scrollbar();
+}
+
+.popularity .popularity-tags {
+  padding: 0.5rem 2px 0 0; // here, so it outranks the list reset above
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.35rem 0.6rem;
+    border: 0;
+    border-radius: 5px;
+    background: none;
+    color: var(--kind);
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+
+    @media (hover: hover) {
+      &:hover {
+        background: @highlight;
+      }
+    }
+
+    &[aria-pressed="true"] {
+      background: color-mix(in srgb, var(--kind) 22%, transparent);
+    }
+  }
+}
+
+.popularity-count {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.popularity-cards {
+  h4 {
+    margin: 0.35rem 0 0.5rem;
+    .eyebrow();
+    color: var(--kind);
+  }
+
+  li {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #ffffff14;
+    font-size: 0.9rem;
+  }
+}
+

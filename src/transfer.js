@@ -72,7 +72,8 @@ export function parseImport(text) {
  */
 export async function loadDefaultTags() {
   try {
-    const res = await fetch(`${import.meta.env.BASE_URL}default-tarot-tags.json`);
+    // "no-cache": always check with the server, so a newly published defaults file is picked up right away.
+    const res = await fetch(`${import.meta.env.BASE_URL}default-tarot-tags.json`, { cache: "no-cache" });
     if (!res.ok) return null;
     const parsed = parseImport(await res.text());
     return parsed.ok ? parsed : null;
